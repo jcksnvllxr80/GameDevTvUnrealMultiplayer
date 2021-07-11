@@ -4,17 +4,21 @@ Make Local & Online Multiplayer Games. Improve Your Coding Programming Skills. M
 
 These are my notes and code from taking this course as described above
 
-Launch a server:
+# NOTES
+
+## Launch a server:
 
 Using Command Prompt (CMD)...
 
-"C:\Program Files\UE_4.26\Engine\Binaries\Win64\UE4Editor.exe" "C:\Users\A-A-Ron\git\GameDevTvUnrealMultiplayer\PuzzlePlatforms\PuzzlePlatforms.uproject" -game
+- "C:\Program Files\UE_4.26\Engine\Binaries\Win64\UE4Editor.exe" "C:\Users\A-A-Ron\git\GameDevTvUnrealMultiplayer\PuzzlePlatforms\PuzzlePlatforms.uproject" -game
 
-C:\Users\A-A-Ron>"C:\Program Files\UE_4.26\Engine\Binaries\Win64\UE4Editor.exe" "C:\Users\A-A-Ron\git\GameDevTvUnrealMultiplayer\PuzzlePlatforms\PuzzlePlatforms.uproject" -game -log
+- C:\Users\A-A-Ron>"C:\Program Files\UE_4.26\Engine\Binaries\Win64\UE4Editor.exe" "C:\Users\A-A-Ron\git\GameDevTvUnrealMultiplayer\PuzzlePlatforms\PuzzlePlatforms.uproject" -game -log
 
-C:\Users\A-A-Ron>"C:\Program Files\UE_4.26\Engine\Binaries\Win64\UE4Editor.exe" "C:\Users\A-A-Ron\git\GameDevTvUnrealMultiplayer\PuzzlePlatforms\PuzzlePlatforms.uproject" /Game/ThirdPersonCPP/Maps/ThirdPersonExampleMap -game -log
+- C:\Users\A-A-Ron>"C:\Program Files\UE_4.26\Engine\Binaries\Win64\UE4Editor.exe" "C:\Users\A-A-Ron\git\GameDevTvUnrealMultiplayer\PuzzlePlatforms\PuzzlePlatforms.uproject" /Game/ThirdPersonCPP/Maps/ThirdPersonExampleMap -game -log
 
----- If you are having issues spawning servers, try the following:
+---- 
+
+If you are having issues spawning servers, try the following:
 
 Does your command line for the server look like this? "C:\\Program Files\\Epic Games\\UE_4.24\\Engine\\Binaries\\Win64\\UE4Editor.exe" "C:\\Path\\To\\My\\Project.uproject" /Game/ThirdPersonCPP/Maps/ThirdPersonExampleMap?listen -server -log Including ?listen and the map.
 
@@ -24,8 +28,10 @@ Is Steam VR or Oculus stopping multiple games from loading?
 
 ----
 
-Launching a client to connect to the server:
+## Launching a client to connect to the server:
 
 Again, using command prompt...
 
-C:\Users\A-A-Ron>"C:\Program Files\UE_4.26\Engine\Binaries\Win64\UE4Editor.exe" "C:\Users\A-A-Ron\git\GameDevTvUnrealMultiplayer\PuzzlePlatforms\PuzzlePlatforms.uproject" 192.168.1.116 -game -log
+- C:\Users\A-A-Ron>"C:\Program Files\UE_4.26\Engine\Binaries\Win64\UE4Editor.exe" "C:\Users\A-A-Ron\git\GameDevTvUnrealMultiplayer\PuzzlePlatforms\PuzzlePlatforms.uproject" 192.168.1.116 -game -log
+
+- C:\Users\A-A-Ron>"C:\Program Files\UE_4.26\Engine\Binaries\Win64\UE4Editor.exe" "C:\Users\A-A-Ron\git\GameDevTvUnrealMultiplayer\PuzzlePlatforms\PuzzlePlatforms.uproject" 192.168.1.116:7777 -game -log
