@@ -28,7 +28,7 @@ Is Steam VR or Oculus stopping multiple games from loading?
 
 ----
 
-## Launching a client to connect to the server:
+## Launch a client to connect to the server:
 
 Again, using command prompt...
 
