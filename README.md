@@ -35,3 +35,15 @@ Again, using command prompt...
 - C:\Users\A-A-Ron>"C:\Program Files\UE_4.26\Engine\Binaries\Win64\UE4Editor.exe" "C:\Users\A-A-Ron\git\GameDevTvUnrealMultiplayer\PuzzlePlatforms\PuzzlePlatforms.uproject" 192.168.1.116 -game -log
 
 - C:\Users\A-A-Ron>"C:\Program Files\UE_4.26\Engine\Binaries\Win64\UE4Editor.exe" "C:\Users\A-A-Ron\git\GameDevTvUnrealMultiplayer\PuzzlePlatforms\PuzzlePlatforms.uproject" 192.168.1.116:7777 -game -log
+
+----
+
+## Play with friends over the internet without port forwarding
+
+1. go to www.vpn.net
+2. download hamachi
+3. sign up for an account
+4. create a new network (free accounts only get 5 computers on their network)
+5. another user will join the created network with network name and password
+6. get game server IP by right-clicking the computer of the game server and copying the IPV4 address
+7. now a friend can connect to my machine as if on LAN by connecting to my computer
