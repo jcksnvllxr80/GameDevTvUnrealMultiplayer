@@ -47,3 +47,13 @@ Again, using command prompt...
 5. another user will join the created network with network name and password
 6. get game server IP by right-clicking the computer of the game server and copying the IPV4 address
 7. now a friend can connect to my machine as if on LAN by connecting to my computer
+
+
+----
+
+# Cool Websites
+
+1. www.everytimezone.com 
+  shows timezones and how they related to one another
+2. www.sharedrop.io
+  allows users to drag and drop files to one another
