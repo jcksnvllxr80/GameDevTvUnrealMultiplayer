@@ -44,7 +44,7 @@ Using Powershell...
 
 - & "C:\Program Files\UE_4.26\Engine\Binaries\Win64\UE4Editor.exe" "C:\Users\A-A-Ron\git\GameDevTvUnrealMultiplayer\PuzzlePlatforms\PuzzlePlatforms.uproject" /Game/PuzzlePlatforms/Maps/Lobby -game
 - implement some UFUNCTION(Exec) c++ code in the GameInstance class to handle console "Host" and "Join" commands
-#### Launch a game to connect to the server in the same way as shown above in the [Launch a client to connect to the server](#Launch-a-client-to-connect-to-the-server) section [Notes](#NOTES)
+#### Launch a game to connect to the server in the same way as shown above in the [Launch a client to connect to the server](#Launch-a-client-to-connect-to-the-server) section
 
 ----
 
