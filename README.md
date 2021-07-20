@@ -38,7 +38,7 @@ Again, using command prompt...
 
 ----
 
-## Launch a server to the LOBBY:
+## Launch a server to the LOBBY and use Host command server travel. Then launch another game as client and Join the server:
 
 First...
 - Implement some UFUNCTION(Exec) c++ code in the GameInstance class to handle console "Host" and "Join" commands
@@ -50,7 +50,9 @@ Next, Using Powershell...
 Then...
 - Run the server in the lobby as shown above and use ~ to enter the command console and use the Host command
 - Run the client in the same way except use the Join command with the IP address of the server as an argument
-#### Launch a game to connect to the server in the same way as shown above in the [Launch a client to connect to the server](#Launch-a-client-to-connect-to-the-server) section
+
+Finally...
+- Launch a game to connect to the server in the same way as shown above in the [Launch a client to connect to the server](#Launch-a-client-to-connect-to-the-server) section
 
 ----
 
