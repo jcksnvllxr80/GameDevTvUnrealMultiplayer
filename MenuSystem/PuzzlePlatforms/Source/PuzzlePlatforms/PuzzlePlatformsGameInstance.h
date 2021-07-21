@@ -23,4 +23,7 @@ public:
 
 	UFUNCTION(Exec)
 	void Join(const FString& IpAddress);
+
+private:
+	TSubclassOf<class UUserWidget> MenuClass = nullptr;
 };
