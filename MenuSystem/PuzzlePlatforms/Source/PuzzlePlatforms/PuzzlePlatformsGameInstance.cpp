@@ -16,14 +16,7 @@ UPuzzlePlatformsGameInstance::UPuzzlePlatformsGameInstance(const FObjectInitiali
 
 void UPuzzlePlatformsGameInstance::Init()
 {
-	if (MenuClass)
-	{
-		UE_LOG(LogTemp, Display, TEXT("Found Main Menu blueprint class %s."), *MenuClass->GetName());
-	}
-	else
-	{
-		UE_LOG(LogTemp, Error, TEXT("Cant find the Main Menu blueprint class."));
-	}
+	UE_LOG(LogTemp, Display, TEXT("Hello from UPuzzlePlatformsGameInstance init."));
 }
 
 void UPuzzlePlatformsGameInstance::Host()
@@ -47,4 +40,42 @@ void UPuzzlePlatformsGameInstance::Join(const FString& IpAddress)
 	APlayerController* PlayerController = GetFirstLocalPlayerController();
 	if (!PlayerController) return;
 	PlayerController->ClientTravel(IpAddress, ETravelType::TRAVEL_Absolute);
+}
+
+void UPuzzlePlatformsGameInstance::LoadMenu()
+{
+	if (MenuClass)
+	{
+		UE_LOG(LogTemp, Display, TEXT("Found Main Menu blueprint class %s."), *MenuClass->GetName());
+		UUserWidget* Menu = CreateWidget<UUserWidget>(this, MenuClass);
+		if (Menu)
+		{
+			Menu->AddToViewport();
+			APlayerController* PlayerController = GetFirstLocalPlayerController();
+			if (PlayerController)
+			{
+				FInputModeUIOnly InputModeData;
+				InputModeData.SetWidgetToFocus(Menu->TakeWidget());
+				InputModeData.SetLockMouseToViewportBehavior(EMouseLockMode::DoNotLock);
+				PlayerController->SetInputMode(InputModeData);
+				PlayerController->bShowMouseCursor = true;
+			}
+			else
+			{
+				UE_LOG(LogTemp, Error, TEXT("Cant find player controller."));
+				return;
+			}
+		}
+		else
+		{
+			UE_LOG(LogTemp, Error, TEXT("Cant create UUserWidget Menu from main menu blueprint class."));
+			return;
+		}
+	}
+	else
+	{
+		UE_LOG(LogTemp, Error, TEXT("Cant find the Main Menu blueprint class."));
+		return;
+	}
+	
 }
