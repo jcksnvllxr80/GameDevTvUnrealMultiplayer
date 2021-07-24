@@ -33,12 +33,26 @@ bool UMainMenu::Initialize()
 	return true;
 }
 
+void UMainMenu::SetMenuInterface(IMenuInterface* _MenuInterface)
+{
+	this->MenuInterface = _MenuInterface;
+}
+
 void UMainMenu::HostServer()
 {
 	UE_LOG(LogTemp, Display, TEXT("Hosting a server"))
+	if (MenuInterface)
+	{
+		MenuInterface->Host();
+	}
 }
 
 void UMainMenu::JoinServer()
 {
 	UE_LOG(LogTemp, Display, TEXT("Joining a server"))
+	if (MenuInterface)
+	{
+		FString IpAddress = TEXT("127.0.0.1");
+		MenuInterface->Join(IpAddress);
+	}
 }

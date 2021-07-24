@@ -6,6 +6,7 @@
 #include "Engine/Engine.h"
 #include "UObject/ConstructorHelpers.h"
 #include "Blueprint/UserWidget.h"
+#include "MenuSystem/MainMenu.h"
 #include "PlatformTrigger.h"
 
 UPuzzlePlatformsGameInstance::UPuzzlePlatformsGameInstance(const FObjectInitializer & ObjectInitializer)
@@ -30,7 +31,7 @@ void UPuzzlePlatformsGameInstance::Host()
 	World->ServerTravel("/Game/ThirdPersonCPP/Maps/ThirdPersonExampleMap?listen");
 }
 
-void UPuzzlePlatformsGameInstance::Join(const FString& IpAddress)
+void UPuzzlePlatformsGameInstance::Join(FString& IpAddress)
 {
 	UEngine* Engine = GetEngine();
 	if (!Engine) return;
@@ -47,7 +48,7 @@ void UPuzzlePlatformsGameInstance::LoadMenu()
 	if (MenuClass)
 	{
 		UE_LOG(LogTemp, Display, TEXT("Found Main Menu blueprint class %s."), *MenuClass->GetName());
-		UUserWidget* Menu = CreateWidget<UUserWidget>(this, MenuClass);
+		UMainMenu* Menu = CreateWidget<UMainMenu>(this, MenuClass);
 		if (Menu)
 		{
 			Menu->AddToViewport();
@@ -59,6 +60,7 @@ void UPuzzlePlatformsGameInstance::LoadMenu()
 				InputModeData.SetLockMouseToViewportBehavior(EMouseLockMode::DoNotLock);
 				PlayerController->SetInputMode(InputModeData);
 				PlayerController->bShowMouseCursor = true;
+				Menu->SetMenuInterface(this);
 			}
 			else
 			{
