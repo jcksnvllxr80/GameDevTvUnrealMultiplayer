@@ -3,7 +3,6 @@
 
 #include "MainMenu.h"
 #include "Components/Button.h"
-#include "PuzzlePlatforms/PuzzlePlatformsGameInstance.h"
 
 bool UMainMenu::Initialize()
 {
