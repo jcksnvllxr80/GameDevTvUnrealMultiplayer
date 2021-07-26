@@ -37,6 +37,9 @@ private:
 	class UButton* BackButton;
 
 	UPROPERTY(meta = (BindWidget))
+	class UEditableText* HostIpAddress;
+
+	UPROPERTY(meta = (BindWidget))
 	class UWidgetSwitcher* MenuSwitcher;
 
 	UPROPERTY(meta = (BindWidget))

@@ -4,6 +4,7 @@
 #include "MainMenu.h"
 #include "Components/Button.h"
 #include "Components/WidgetSwitcher.h"
+#include "Components/EditableText.h"
 
 bool UMainMenu::Initialize()
 {
@@ -149,8 +150,16 @@ void UMainMenu::JoinServer()
 	UE_LOG(LogTemp, Display, TEXT("Joining a server"))
 	if (MenuInterface)
 	{
-		FString IpAddress = TEXT("127.0.0.1");
-		MenuInterface->Join(IpAddress);
+		if (HostIpAddress)
+		{
+			FString IpAddress = HostIpAddress->GetText().ToString();
+			MenuInterface->Join(IpAddress);
+		}
+		else
+		{
+			UE_LOG(LogTemp, Error, TEXT("JOIN SERVER FAILED! Cant find the HostIpAddress Widget."));
+			return;
+		}
 	}
 }
 
@@ -164,7 +173,7 @@ void UMainMenu::BackToMainMenu()
 		}
 		else
 		{
-			UE_LOG(LogTemp, Error, TEXT("OPEN JKOIN MENU FAILED! Cant find the MainMenu Widget."));
+			UE_LOG(LogTemp, Error, TEXT("OPEN MAIN MENU FAILED! Cant find the MainMenu Widget."));
 			return;
 		}
 	}
