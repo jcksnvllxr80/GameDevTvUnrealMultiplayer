@@ -48,25 +48,11 @@ void UPuzzlePlatformsGameInstance::LoadMenu()
 	if (MenuClass)
 	{
 		UE_LOG(LogTemp, Display, TEXT("Found Main Menu blueprint class %s."), *MenuClass->GetName());
-		UMainMenu* Menu = CreateWidget<UMainMenu>(this, MenuClass);
+		Menu = CreateWidget<UMainMenu>(this, MenuClass);
 		if (Menu)
 		{
-			Menu->AddToViewport();
-			APlayerController* PlayerController = GetFirstLocalPlayerController();
-			if (PlayerController)
-			{
-				FInputModeUIOnly InputModeData;
-				InputModeData.SetWidgetToFocus(Menu->TakeWidget());
-				InputModeData.SetLockMouseToViewportBehavior(EMouseLockMode::DoNotLock);
-				PlayerController->SetInputMode(InputModeData);
-				PlayerController->bShowMouseCursor = true;
-				Menu->SetMenuInterface(this);
-			}
-			else
-			{
-				UE_LOG(LogTemp, Error, TEXT("Cant find player controller."));
-				return;
-			}
+			Menu->Setup();
+			Menu->SetMenuInterface(this);
 		}
 		else
 		{

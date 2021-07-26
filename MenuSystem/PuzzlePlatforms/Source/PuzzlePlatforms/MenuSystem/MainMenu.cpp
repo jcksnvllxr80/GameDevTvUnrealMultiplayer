@@ -38,6 +38,61 @@ void UMainMenu::SetMenuInterface(IMenuInterface* _MenuInterface)
 	this->MenuInterface = _MenuInterface;
 }
 
+void UMainMenu::Setup()
+{
+	this->AddToViewport();
+	UWorld* World = GetWorld();
+	if (World)
+	{
+		APlayerController* PlayerController = World->GetFirstPlayerController();
+		if (PlayerController)
+		{
+			FInputModeUIOnly InputModeData;
+			InputModeData.SetWidgetToFocus(this->TakeWidget());
+			InputModeData.SetLockMouseToViewportBehavior(EMouseLockMode::DoNotLock);
+			PlayerController->SetInputMode(InputModeData);
+			PlayerController->bShowMouseCursor = true;
+		}
+		else
+		{
+			UE_LOG(LogTemp, Error, TEXT("Cant find player controller."));
+			return;
+		}
+	}
+	else
+	{
+		UE_LOG(LogTemp, Error, TEXT("Cant find World obj."));
+		return;
+	}
+}
+
+void UMainMenu::OnLevelRemovedFromWorld(ULevel* InLevel, UWorld* InWorld)
+{
+	Super::OnLevelRemovedFromWorld(InLevel, InWorld);
+	this->RemoveFromViewport();
+	UWorld* World = GetWorld();
+	if (World)
+	{
+		APlayerController* PlayerController = World->GetFirstPlayerController();
+		if (PlayerController)
+		{
+			const FInputModeGameOnly InputModeData;
+			PlayerController->SetInputMode(InputModeData);
+			PlayerController->bShowMouseCursor = false;
+		}
+		else
+		{
+			UE_LOG(LogTemp, Error, TEXT("Cant find player controller."));
+			return;
+		}
+	}
+	else
+	{
+		UE_LOG(LogTemp, Error, TEXT("Cant find World obj."));
+		return;
+	}
+}
+
 void UMainMenu::HostServer()
 {
 	UE_LOG(LogTemp, Display, TEXT("Hosting a server"))
