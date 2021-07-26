@@ -3,15 +3,16 @@
 
 #include "MainMenu.h"
 #include "Components/Button.h"
+#include "Components/WidgetSwitcher.h"
 
 bool UMainMenu::Initialize()
 {
 	const bool SuccessfulInit = Super::Initialize();
 	if (!SuccessfulInit) return false;
 	
-	if (Host)
+	if (HostButton)
 	{
-		Host->OnClicked.AddDynamic(this, &UMainMenu::HostServer);
+		HostButton->OnClicked.AddDynamic(this, &UMainMenu::HostServer);
 	}
 	else
 	{
@@ -19,13 +20,33 @@ bool UMainMenu::Initialize()
 		return false;
 	}
 	
-	if (Join)
+	if (OpenJoinMenuButton)
 	{
-		Join->OnClicked.AddDynamic(this, &UMainMenu::JoinServer);
+		OpenJoinMenuButton->OnClicked.AddDynamic(this, &UMainMenu::OpenJoinMenu);
+	}
+	else
+	{
+		UE_LOG(LogTemp, Error, TEXT("INIT FAILED! Cant find the Open Join Menu button during init."));
+		return false;
+	}
+
+	if (JoinButton)
+	{
+		JoinButton->OnClicked.AddDynamic(this, &UMainMenu::JoinServer);
 	}
 	else
 	{
 		UE_LOG(LogTemp, Error, TEXT("INIT FAILED! Cant find the Join button during init."));
+		return false;
+	}
+	
+	if (BackButton)
+	{
+		BackButton->OnClicked.AddDynamic(this, &UMainMenu::BackToMainMenu);
+	}
+	else
+	{
+		UE_LOG(LogTemp, Error, TEXT("INIT FAILED! Cant find the Back button during init."));
 		return false;
 	}
 
@@ -102,6 +123,27 @@ void UMainMenu::HostServer()
 	}
 }
 
+void UMainMenu::OpenJoinMenu()
+{
+	if (MenuSwitcher)
+	{
+		if (JoinMenu)
+		{
+			MenuSwitcher->SetActiveWidget(JoinMenu);
+		}
+		else
+		{
+			UE_LOG(LogTemp, Error, TEXT("OPEN JKOIN MENU FAILED! Cant find the JoinMenu Widget."));
+			return;
+		}
+	}
+	else
+	{
+		UE_LOG(LogTemp, Error, TEXT("OPEN JOIN MENU FAILED! Cant find the Menu Switcher OBJ."));
+		return;
+	}
+}
+
 void UMainMenu::JoinServer()
 {
 	UE_LOG(LogTemp, Display, TEXT("Joining a server"))
@@ -109,5 +151,26 @@ void UMainMenu::JoinServer()
 	{
 		FString IpAddress = TEXT("127.0.0.1");
 		MenuInterface->Join(IpAddress);
+	}
+}
+
+void UMainMenu::BackToMainMenu()
+{
+	if (MenuSwitcher)
+	{
+		if (MainMenu)
+		{
+			MenuSwitcher->SetActiveWidget(MainMenu);
+		}
+		else
+		{
+			UE_LOG(LogTemp, Error, TEXT("OPEN JKOIN MENU FAILED! Cant find the MainMenu Widget."));
+			return;
+		}
+	}
+	else
+	{
+		UE_LOG(LogTemp, Error, TEXT("OPEN MAIN MENU FAILED! Cant find the Menu Switcher OBJ."));
+		return;
 	}
 }
