@@ -28,6 +28,9 @@ private:
 	class UButton* JoinButton;
 
 	UPROPERTY(meta = (BindWidget))
+	class UButton* DesktopButton;
+
+	UPROPERTY(meta = (BindWidget))
 	class UEditableText* HostIpAddress;
 
 	UPROPERTY(meta = (BindWidget))
@@ -47,4 +50,7 @@ private:
 
 	UFUNCTION()
 	void JoinServer();
+
+	UFUNCTION()
+	void QuitGame();
 };

@@ -41,6 +41,16 @@ bool UMainMenu::Initialize()
 		return false;
 	}
 
+	if (DesktopButton)
+	{
+		DesktopButton->OnClicked.AddDynamic(this, &UMainMenu::QuitGame);
+	}
+	else
+	{
+		UE_LOG(LogTemp, Error, TEXT("INIT FAILED! Cant find the Desktop button during init."));
+		return false;
+	}
+
 	UE_LOG(LogTemp, Display, TEXT("Main Menu Init complete!"));
 	return true;
 }
@@ -91,4 +101,29 @@ void UMainMenu::JoinServer()
 			return;
 		}
 	}
+}
+
+void UMainMenu::QuitGame()
+{
+	UWorld* World = GetWorld();
+	if (World)
+	{
+		APlayerController* PlayerController = World->GetFirstPlayerController();
+		if (PlayerController)
+		{
+			const FString QuitCommand = TEXT("quit");
+			PlayerController->ConsoleCommand(QuitCommand);
+		}
+		else
+		{
+			UE_LOG(LogTemp, Error, TEXT("Cant find player controller."));
+			return;
+		}
+	}
+	else
+	{
+		UE_LOG(LogTemp, Error, TEXT("Cant find World."));
+		return;
+	}
+
 }
