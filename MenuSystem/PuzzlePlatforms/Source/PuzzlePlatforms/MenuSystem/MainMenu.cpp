@@ -40,79 +40,9 @@ bool UMainMenu::Initialize()
 		UE_LOG(LogTemp, Error, TEXT("INIT FAILED! Cant find the Join button during init."));
 		return false;
 	}
-	
-	if (BackButton)
-	{
-		BackButton->OnClicked.AddDynamic(this, &UMainMenu::BackToMainMenu);
-	}
-	else
-	{
-		UE_LOG(LogTemp, Error, TEXT("INIT FAILED! Cant find the Back button during init."));
-		return false;
-	}
 
-	UE_LOG(LogTemp, Display, TEXT("Init complete!"));
+	UE_LOG(LogTemp, Display, TEXT("Main Menu Init complete!"));
 	return true;
-}
-
-void UMainMenu::SetMenuInterface(IMenuInterface* _MenuInterface)
-{
-	this->MenuInterface = _MenuInterface;
-}
-
-void UMainMenu::Setup()
-{
-	this->AddToViewport();
-	UWorld* World = GetWorld();
-	if (World)
-	{
-		APlayerController* PlayerController = World->GetFirstPlayerController();
-		if (PlayerController)
-		{
-			FInputModeUIOnly InputModeData;
-			InputModeData.SetWidgetToFocus(this->TakeWidget());
-			InputModeData.SetLockMouseToViewportBehavior(EMouseLockMode::DoNotLock);
-			PlayerController->SetInputMode(InputModeData);
-			PlayerController->bShowMouseCursor = true;
-		}
-		else
-		{
-			UE_LOG(LogTemp, Error, TEXT("Cant find player controller."));
-			return;
-		}
-	}
-	else
-	{
-		UE_LOG(LogTemp, Error, TEXT("Cant find World obj."));
-		return;
-	}
-}
-
-void UMainMenu::OnLevelRemovedFromWorld(ULevel* InLevel, UWorld* InWorld)
-{
-	Super::OnLevelRemovedFromWorld(InLevel, InWorld);
-	this->RemoveFromViewport();
-	UWorld* World = GetWorld();
-	if (World)
-	{
-		APlayerController* PlayerController = World->GetFirstPlayerController();
-		if (PlayerController)
-		{
-			const FInputModeGameOnly InputModeData;
-			PlayerController->SetInputMode(InputModeData);
-			PlayerController->bShowMouseCursor = false;
-		}
-		else
-		{
-			UE_LOG(LogTemp, Error, TEXT("Cant find player controller."));
-			return;
-		}
-	}
-	else
-	{
-		UE_LOG(LogTemp, Error, TEXT("Cant find World obj."));
-		return;
-	}
 }
 
 void UMainMenu::HostServer()
@@ -160,26 +90,5 @@ void UMainMenu::JoinServer()
 			UE_LOG(LogTemp, Error, TEXT("JOIN SERVER FAILED! Cant find the HostIpAddress Widget."));
 			return;
 		}
-	}
-}
-
-void UMainMenu::BackToMainMenu()
-{
-	if (MenuSwitcher)
-	{
-		if (MainMenu)
-		{
-			MenuSwitcher->SetActiveWidget(MainMenu);
-		}
-		else
-		{
-			UE_LOG(LogTemp, Error, TEXT("OPEN MAIN MENU FAILED! Cant find the MainMenu Widget."));
-			return;
-		}
-	}
-	else
-	{
-		UE_LOG(LogTemp, Error, TEXT("OPEN MAIN MENU FAILED! Cant find the Menu Switcher OBJ."));
-		return;
 	}
 }
