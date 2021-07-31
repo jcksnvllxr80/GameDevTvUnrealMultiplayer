@@ -27,11 +27,19 @@ void UPuzzlePlatformsGameInstance::Init()
 	IOnlineSubsystem* Subsystem = IOnlineSubsystem::Get();
 	if (!Subsystem)
 	{
-		UE_LOG(LogTemp, Error, TEXT("Cant find IOnlineSubsystem."));
+		UE_LOG(LogTemp, Error, TEXT("Cant find IOnlineSubsystem, exiting Init early."));
 		return;
 	}
-	UE_LOG(LogTemp, Display, TEXT("Hello, got the IOnlineSubsystem, %s, from UPuzzlePlatformsGameInstance init."),
+	UE_LOG(LogTemp, Display, TEXT("Hello, got the IOnlineSubsystem, %s, from UPuzzlePlatformsGameInstance Init."),
 		*Subsystem->GetSubsystemName().ToString());
+	IOnlineSessionPtr SessionInterface = Subsystem->GetSessionInterface();
+
+	if (!SessionInterface.IsValid())
+	{
+		UE_LOG(LogTemp, Error, TEXT("Cant find SessionInterface, exiting Init early."));
+		return;
+	}
+	UE_LOG(LogTemp, Display, TEXT("Found the SessionInterface."));
 }
 
 void UPuzzlePlatformsGameInstance::LoadMainMenu()
