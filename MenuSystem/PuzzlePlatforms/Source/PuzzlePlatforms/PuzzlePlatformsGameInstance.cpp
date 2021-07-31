@@ -30,7 +30,8 @@ void UPuzzlePlatformsGameInstance::Init()
 		UE_LOG(LogTemp, Error, TEXT("Cant find IOnlineSubsystem."));
 		return;
 	}
-	UE_LOG(LogTemp, Display, TEXT("Hello from UPuzzlePlatformsGameInstance init."));
+	UE_LOG(LogTemp, Display, TEXT("Hello, got the IOnlineSubsystem, %s, from UPuzzlePlatformsGameInstance init."),
+		*Subsystem->GetSubsystemName().ToString());
 }
 
 void UPuzzlePlatformsGameInstance::LoadMainMenu()
