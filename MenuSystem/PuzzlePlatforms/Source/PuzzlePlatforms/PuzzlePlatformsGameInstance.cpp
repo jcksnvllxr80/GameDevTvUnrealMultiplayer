@@ -8,6 +8,7 @@
 #include "Blueprint/UserWidget.h"
 #include "MenuSystem/MainMenu.h"
 #include "MenuSystem/MenuWidget.h"
+#include "OnlineSubsystem.h"
 #include "PlatformTrigger.h"
 
 UPuzzlePlatformsGameInstance::UPuzzlePlatformsGameInstance(const FObjectInitializer & ObjectInitializer)
@@ -23,6 +24,12 @@ UPuzzlePlatformsGameInstance::UPuzzlePlatformsGameInstance(const FObjectInitiali
 
 void UPuzzlePlatformsGameInstance::Init()
 {
+	IOnlineSubsystem* Subsystem = IOnlineSubsystem::Get();
+	if (!Subsystem)
+	{
+		UE_LOG(LogTemp, Error, TEXT("Cant find IOnlineSubsystem."));
+		return;
+	}
 	UE_LOG(LogTemp, Display, TEXT("Hello from UPuzzlePlatformsGameInstance init."));
 }
 
