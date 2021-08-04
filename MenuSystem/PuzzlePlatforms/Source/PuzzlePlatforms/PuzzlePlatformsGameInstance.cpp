@@ -9,6 +9,8 @@
 #include "MenuSystem/MainMenu.h"
 #include "MenuSystem/MenuWidget.h"
 #include "OnlineSubsystem.h"
+#include "OnlineSessionSettings.h"
+#include "Interfaces/OnlineSessionInterface.h"
 #include "PlatformTrigger.h"
 
 UPuzzlePlatformsGameInstance::UPuzzlePlatformsGameInstance(const FObjectInitializer & ObjectInitializer)
@@ -32,7 +34,7 @@ void UPuzzlePlatformsGameInstance::Init()
 	}
 	UE_LOG(LogTemp, Display, TEXT("Hello, got the IOnlineSubsystem, %s, from UPuzzlePlatformsGameInstance Init."),
 		*Subsystem->GetSubsystemName().ToString());
-	IOnlineSessionPtr SessionInterface = Subsystem->GetSessionInterface();
+	SessionInterface = Subsystem->GetSessionInterface();
 
 	if (!SessionInterface.IsValid())
 	{
@@ -40,6 +42,8 @@ void UPuzzlePlatformsGameInstance::Init()
 		return;
 	}
 	UE_LOG(LogTemp, Display, TEXT("Found the SessionInterface."));
+	SessionInterface->OnCreateSessionCompleteDelegates.AddUObject(
+		this, &UPuzzlePlatformsGameInstance::OnGameSessionComplete);
 }
 
 void UPuzzlePlatformsGameInstance::LoadMainMenu()
@@ -51,13 +55,13 @@ void UPuzzlePlatformsGameInstance::LoadMainMenu()
 
 void UPuzzlePlatformsGameInstance::Host()
 {
-	UEngine* Engine = GetEngine();
-	if (!Engine) return;
-	Engine->AddOnScreenDebugMessage(0,2,FColor::Green,TEXT("Hosting"));
-
-	UWorld* World = GetWorld();
-	if (!World) return;
-	World->ServerTravel("/Game/ThirdPersonCPP/Maps/ThirdPersonExampleMap?listen");
+	if (!SessionInterface.IsValid())
+	{
+		UE_LOG(LogTemp, Error, TEXT("There is no SessionInterface, exiting Host func early."));
+		return;
+	}
+	FOnlineSessionSettings SessionSettings;
+	SessionInterface->CreateSession(0, TEXT("My Session Game"), SessionSettings);
 }
 
 void UPuzzlePlatformsGameInstance::Join(FString& IpAddress)
@@ -119,4 +123,20 @@ void UPuzzlePlatformsGameInstance::InGameLoadMenu()
 		UE_LOG(LogTemp, Error, TEXT("Cant find the Main Menu blueprint class."));
 		return;
 	}
+}
+
+void UPuzzlePlatformsGameInstance::OnGameSessionComplete(FName SessionName, bool Success)
+{
+	if (!Success)
+	{
+		UE_LOG(LogTemp, Error, TEXT("Not able to create a session."));
+		return;
+	}
+	UEngine* Engine = GetEngine();
+	if (!Engine) return;
+	Engine->AddOnScreenDebugMessage(0,2,FColor::Green,TEXT("Hosting"));
+
+	UWorld* World = GetWorld();
+	if (!World) return;
+	World->ServerTravel("/Game/ThirdPersonCPP/Maps/ThirdPersonExampleMap?listen");
 }
