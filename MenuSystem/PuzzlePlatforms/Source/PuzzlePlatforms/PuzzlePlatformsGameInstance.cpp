@@ -13,6 +13,8 @@
 #include "Interfaces/OnlineSessionInterface.h"
 #include "PlatformTrigger.h"
 
+const static FName SESSION_NAME = TEXT("My Session Game");
+
 UPuzzlePlatformsGameInstance::UPuzzlePlatformsGameInstance(const FObjectInitializer & ObjectInitializer)
 {
 	ConstructorHelpers::FClassFinder<UUserWidget> MainMenuBPClass(TEXT("/Game/MenuSystem/WBP_MainMenu"));
@@ -44,6 +46,8 @@ void UPuzzlePlatformsGameInstance::Init()
 	UE_LOG(LogTemp, Display, TEXT("Found the SessionInterface."));
 	SessionInterface->OnCreateSessionCompleteDelegates.AddUObject(
 		this, &UPuzzlePlatformsGameInstance::OnGameSessionComplete);
+	SessionInterface->OnDestroySessionCompleteDelegates.AddUObject(
+		this, &UPuzzlePlatformsGameInstance::OnDestroySessionComplete);
 }
 
 void UPuzzlePlatformsGameInstance::LoadMainMenu()
@@ -60,8 +64,13 @@ void UPuzzlePlatformsGameInstance::Host()
 		UE_LOG(LogTemp, Error, TEXT("There is no SessionInterface, exiting Host func early."));
 		return;
 	}
-	FOnlineSessionSettings SessionSettings;
-	SessionInterface->CreateSession(0, TEXT("My Session Game"), SessionSettings);
+	auto ExistingSession = SessionInterface->GetNamedSession(SESSION_NAME);
+	if (!ExistingSession)
+	{
+		CreateSession();
+		return;
+	}
+	SessionInterface->DestroySession(SESSION_NAME);
 }
 
 void UPuzzlePlatformsGameInstance::Join(FString& IpAddress)
@@ -139,4 +148,24 @@ void UPuzzlePlatformsGameInstance::OnGameSessionComplete(FName SessionName, bool
 	UWorld* World = GetWorld();
 	if (!World) return;
 	World->ServerTravel("/Game/ThirdPersonCPP/Maps/ThirdPersonExampleMap?listen");
+}
+
+void UPuzzlePlatformsGameInstance::OnDestroySessionComplete(FName SessionName, bool Success)
+{
+	if (Success)
+	{
+		UE_LOG(LogTemp, Display, TEXT("Session, %s, Destroyed successfully."), *SESSION_NAME.ToString());
+		CreateSession();
+		return;
+	}
+}
+
+void UPuzzlePlatformsGameInstance::CreateSession()
+{
+	if (SessionInterface.IsValid())
+	{
+		UE_LOG(LogTemp, Display, TEXT("Creating session, %s."), *SESSION_NAME.ToString());
+		FOnlineSessionSettings SessionSettings;
+		SessionInterface->CreateSession(0, SESSION_NAME, SessionSettings);
+	}
 }

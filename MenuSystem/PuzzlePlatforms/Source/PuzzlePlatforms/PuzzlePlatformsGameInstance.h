@@ -40,4 +40,6 @@ private:
 	class UMainMenu* Menu;
 	IOnlineSessionPtr SessionInterface;
 	void OnGameSessionComplete(FName SessionName, bool Success);
+	void OnDestroySessionComplete(FName SessionName, bool Success);
+	void CreateSession();
 };
