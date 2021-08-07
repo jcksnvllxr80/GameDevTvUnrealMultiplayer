@@ -3,6 +3,8 @@
 
 #include "PuzzlePlatformsGameInstance.h"
 
+#include <ThirdParty/CryptoPP/5.6.5/include/argnames.h>
+
 #include "Engine/Engine.h"
 #include "UObject/ConstructorHelpers.h"
 #include "Blueprint/UserWidget.h"
@@ -48,6 +50,19 @@ void UPuzzlePlatformsGameInstance::Init()
 		this, &UPuzzlePlatformsGameInstance::OnGameSessionComplete);
 	SessionInterface->OnDestroySessionCompleteDelegates.AddUObject(
 		this, &UPuzzlePlatformsGameInstance::OnDestroySessionComplete);
+	SessionInterface->OnFindSessionsCompleteDelegates.AddUObject(
+	this, &UPuzzlePlatformsGameInstance::OnFindSessionsComplete);
+
+	GameSessionSearch = MakeShareable(new FOnlineSessionSearch());
+	if (!GameSessionSearch.IsValid())
+	{
+		UE_LOG(LogTemp, Error, TEXT("GameSessionSearch, is not valid! Cancel find sessions."));
+		return;
+	}
+	// GameSessionSearch->bIsLanQuery = true;
+	// GameSessionSearch->QuerySettings.Set(key, value);  // will use in the future with steam
+	UE_LOG(LogTemp, Display, TEXT("Starting session search."));
+	SessionInterface->FindSessions(0, GameSessionSearch.ToSharedRef());
 }
 
 void UPuzzlePlatformsGameInstance::LoadMainMenu()
@@ -154,9 +169,38 @@ void UPuzzlePlatformsGameInstance::OnDestroySessionComplete(FName SessionName, b
 {
 	if (Success)
 	{
-		UE_LOG(LogTemp, Display, TEXT("Session, %s, Destroyed successfully."), *SESSION_NAME.ToString());
+		UE_LOG(LogTemp, Display, TEXT("Session, %s, Destroyed successfully."));
 		CreateSession();
-		return;
+	}
+}
+
+void UPuzzlePlatformsGameInstance::OnFindSessionsComplete(bool Success)
+{
+	UE_LOG(LogTemp, Display, TEXT("Finding sessions is complete."));
+	if (Success)
+	{
+		if (!GameSessionSearch.IsValid())
+		{
+			UE_LOG(LogTemp, Error, TEXT("GameSessionSearch is not valid. Cant get find session results."));
+			return;
+		}
+		TArray<FOnlineSessionSearchResult> SessionSearchResults = GameSessionSearch->SearchResults;
+		if (SessionSearchResults.Num() > 0)
+		{
+			for (const FOnlineSessionSearchResult& SessionSearchResult : SessionSearchResults)
+			{
+				UE_LOG(LogTemp, Display, TEXT("Found session, %s with ping: %i ms."),
+					*SessionSearchResult.GetSessionIdStr(), SessionSearchResult.PingInMs);
+			}
+		}
+		else
+		{
+			UE_LOG(LogTemp, Warning, TEXT("There were 0 game sessions found in the find session search."));
+		}
+	}
+	else
+	{
+		UE_LOG(LogTemp, Warning, TEXT("Game session search was not successful."));
 	}
 }
 
@@ -166,6 +210,9 @@ void UPuzzlePlatformsGameInstance::CreateSession()
 	{
 		UE_LOG(LogTemp, Display, TEXT("Creating session, %s."), *SESSION_NAME.ToString());
 		FOnlineSessionSettings SessionSettings;
+		SessionSettings.bIsLANMatch = true;
+		SessionSettings.NumPublicConnections = 2;
+		SessionSettings.bShouldAdvertise = true;
 		SessionInterface->CreateSession(0, SESSION_NAME, SessionSettings);
 	}
 }

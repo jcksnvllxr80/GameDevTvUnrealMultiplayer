@@ -3,6 +3,8 @@
 #pragma once
 
 #include "CoreMinimal.h"
+
+#include "OnlineSessionSettings.h"
 #include "Engine/GameInstance.h"
 #include "MenuSystem/MenuInterface.h"
 #include "OnlineSubsystem.h"
@@ -39,7 +41,9 @@ private:
 	TSubclassOf<class UUserWidget> InGameMenuClass = nullptr;
 	class UMainMenu* Menu;
 	IOnlineSessionPtr SessionInterface;
+	TSharedPtr<class FOnlineSessionSearch> GameSessionSearch;
 	void OnGameSessionComplete(FName SessionName, bool Success);
 	void OnDestroySessionComplete(FName SessionName, bool Success);
+	void OnFindSessionsComplete(bool Success);
 	void CreateSession();
 };
