@@ -3,8 +3,10 @@
 
 #include "MainMenu.h"
 #include "Components/Button.h"
+#include "UObject/ConstructorHelpers.h"
 #include "Components/WidgetSwitcher.h"
 #include "Components/EditableText.h"
+#include "ServerRow.h"
 
 bool UMainMenu::Initialize()
 {
@@ -55,6 +57,13 @@ bool UMainMenu::Initialize()
 	return true;
 }
 
+UMainMenu::UMainMenu(const FObjectInitializer & ObjectInitializer)
+{
+	ConstructorHelpers::FClassFinder<UUserWidget> ServerRowBPClass(TEXT("/Game/MenuSystem/WBP_ServerRow"));
+	if (!ServerRowBPClass.Class) return;
+	ServerRowClass = ServerRowBPClass.Class;
+}
+
 void UMainMenu::HostServer()
 {
 	UE_LOG(LogTemp, Display, TEXT("Hosting a server"))
@@ -88,19 +97,57 @@ void UMainMenu::OpenJoinMenu()
 void UMainMenu::JoinServer()
 {
 	UE_LOG(LogTemp, Display, TEXT("Joining a server"))
-	if (MenuInterface)
+	if (ServerRowClass)
 	{
-		if (HostIpAddress)
+		UE_LOG(LogTemp, Display, TEXT("Found Main Menu blueprint class %s."), *ServerRowClass->GetName());
+		UWorld* World = this->GetWorld();
+		if (World)
 		{
-			FString IpAddress = HostIpAddress->GetText().ToString();
-			MenuInterface->Join(IpAddress);
+			UServerRow* ServerRow = CreateWidget<UServerRow>(World, ServerRowClass);
+			if (ServerRow)
+			{
+				if (ServerList)
+				{
+					ServerList->AddChild(ServerRow);
+				}
+				else
+				{
+					UE_LOG(LogTemp, Error, TEXT("ServerList object is null."));
+					return;
+				}
+			}
+			else
+			{
+				UE_LOG(LogTemp, Error, TEXT("Cant create UMainMenu Menu from main menu blueprint class."));
+				return;
+			}
 		}
 		else
 		{
-			UE_LOG(LogTemp, Error, TEXT("JOIN SERVER FAILED! Cant find the HostIpAddress Widget."));
+			UE_LOG(LogTemp, Error, TEXT("Cant get World from this object."));
 			return;
 		}
+
 	}
+	else
+	{
+		UE_LOG(LogTemp, Error, TEXT("Cant find the Main Menu blueprint class."));
+		return;
+	}
+	
+	// if (MenuInterface)
+	// {
+	// 	if (HostIpAddress)
+	// 	{
+	// 		FString IpAddress = HostIpAddress->GetText().ToString();
+	// 		MenuInterface->Join(IpAddress);
+	// 	}
+	// 	else
+	// 	{
+	// 		UE_LOG(LogTemp, Error, TEXT("JOIN SERVER FAILED! Cant find the HostIpAddress Widget."));
+	// 		return;
+	// 	}
+	// }
 }
 
 void UMainMenu::QuitGame()

@@ -17,7 +17,12 @@ class PUZZLEPLATFORMS_API UMainMenu : public UMenuWidget
 protected:
 	virtual bool Initialize() override;
 	
+public:
+	UMainMenu(const FObjectInitializer & ObjectInitializer);
+
 private:
+	TSubclassOf<class UUserWidget> ServerRowClass = nullptr;
+
 	UPROPERTY(meta = (BindWidget))
 	class UButton* HostButton;
 	
@@ -30,8 +35,11 @@ private:
 	UPROPERTY(meta = (BindWidget))
 	class UButton* DesktopButton;
 
+	// UPROPERTY(meta = (BindWidget))
+	// class UEditableText* HostIpAddress;
+
 	UPROPERTY(meta = (BindWidget))
-	class UEditableText* HostIpAddress;
+	class UPanelWidget* ServerList;
 
 	UPROPERTY(meta = (BindWidget))
 	class UWidgetSwitcher* MenuSwitcher;
