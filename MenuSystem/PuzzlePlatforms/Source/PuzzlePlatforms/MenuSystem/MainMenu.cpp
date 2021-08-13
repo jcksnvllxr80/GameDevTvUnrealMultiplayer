@@ -7,6 +7,7 @@
 #include "Components/WidgetSwitcher.h"
 #include "Components/EditableText.h"
 #include "ServerRow.h"
+#include "Components/TextBlock.h"
 
 bool UMainMenu::Initialize()
 {
@@ -64,6 +65,53 @@ UMainMenu::UMainMenu(const FObjectInitializer & ObjectInitializer)
 	ServerRowClass = ServerRowBPClass.Class;
 }
 
+void UMainMenu::SetServerList(TArray<FString> ServerNames)
+{
+	UE_LOG(LogTemp, Display, TEXT("Adding available servers to server list."))
+	if (ServerRowClass)
+	{
+		UE_LOG(LogTemp, Display, TEXT("Found Main Menu blueprint class %s."), *ServerRowClass->GetName());
+		UWorld* World = this->GetWorld();
+		if (World)
+		{
+			ServerList->ClearChildren();
+			for (const FString& ServerName : ServerNames)
+			{
+				UServerRow* ServerRow = CreateWidget<UServerRow>(World, ServerRowClass);
+				if (ServerRow)
+				{
+					if (ServerList)
+					{
+						ServerRow->ServerListItem->SetText(FText::FromString(ServerName));
+						ServerList->AddChild(ServerRow);
+					}
+					else
+					{
+						UE_LOG(LogTemp, Error, TEXT("ServerList object is null."));
+						return;
+					}
+				}
+				else
+				{
+					UE_LOG(LogTemp, Error, TEXT("Cant create widget ServerRow."));
+					return;
+				}
+			}
+		}
+		else
+		{
+			UE_LOG(LogTemp, Error, TEXT("Cant get World from this object."));
+			return;
+		}
+
+	}
+	else
+	{
+		UE_LOG(LogTemp, Error, TEXT("Cant find the Main Menu blueprint class."));
+		return;
+	}
+}
+
 void UMainMenu::HostServer()
 {
 	UE_LOG(LogTemp, Display, TEXT("Hosting a server"))
@@ -96,58 +144,22 @@ void UMainMenu::OpenJoinMenu()
 
 void UMainMenu::JoinServer()
 {
-	UE_LOG(LogTemp, Display, TEXT("Joining a server"))
-	if (ServerRowClass)
+	if (MenuInterface)
 	{
-		UE_LOG(LogTemp, Display, TEXT("Found Main Menu blueprint class %s."), *ServerRowClass->GetName());
-		UWorld* World = this->GetWorld();
-		if (World)
+		// if (HostIpAddress)
+		if (true) // TODO: fix this always true
 		{
-			UServerRow* ServerRow = CreateWidget<UServerRow>(World, ServerRowClass);
-			if (ServerRow)
-			{
-				if (ServerList)
-				{
-					ServerList->AddChild(ServerRow);
-				}
-				else
-				{
-					UE_LOG(LogTemp, Error, TEXT("ServerList object is null."));
-					return;
-				}
-			}
-			else
-			{
-				UE_LOG(LogTemp, Error, TEXT("Cant create UMainMenu Menu from main menu blueprint class."));
-				return;
-			}
+			// FString IpAddress = HostIpAddress->GetText().ToString();
+			// MenuInterface->Join(IpAddress);
+			FString Temp = TEXT("asdf");
+			MenuInterface->Join(Temp);
 		}
 		else
 		{
-			UE_LOG(LogTemp, Error, TEXT("Cant get World from this object."));
+			UE_LOG(LogTemp, Error, TEXT("JOIN SERVER FAILED! Cant find the HostIpAddress Widget."));
 			return;
 		}
-
 	}
-	else
-	{
-		UE_LOG(LogTemp, Error, TEXT("Cant find the Main Menu blueprint class."));
-		return;
-	}
-	
-	// if (MenuInterface)
-	// {
-	// 	if (HostIpAddress)
-	// 	{
-	// 		FString IpAddress = HostIpAddress->GetText().ToString();
-	// 		MenuInterface->Join(IpAddress);
-	// 	}
-	// 	else
-	// 	{
-	// 		UE_LOG(LogTemp, Error, TEXT("JOIN SERVER FAILED! Cant find the HostIpAddress Widget."));
-	// 		return;
-	// 	}
-	// }
 }
 
 void UMainMenu::QuitGame()

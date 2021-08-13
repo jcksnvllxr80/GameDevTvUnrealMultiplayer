@@ -90,14 +90,18 @@ void UPuzzlePlatformsGameInstance::Host()
 
 void UPuzzlePlatformsGameInstance::Join(FString& IpAddress)
 {
-	UEngine* Engine = GetEngine();
-	if (!Engine) return;
-	Engine->AddOnScreenDebugMessage(0,5,FColor::Green,
-		FString::Printf(TEXT("Joining %s"), *IpAddress));
-
-	APlayerController* PlayerController = GetFirstLocalPlayerController();
-	if (!PlayerController) return;
-	PlayerController->ClientTravel(IpAddress, ETravelType::TRAVEL_Absolute);
+	if (Menu)
+	{
+		Menu->SetServerList({"Test1", "Test2"});
+	}
+	// UEngine* Engine = GetEngine();
+	// if (!Engine) return;
+	// Engine->AddOnScreenDebugMessage(0,5,FColor::Green,
+	// 	FString::Printf(TEXT("Joining %s"), *IpAddress));
+	//
+	// APlayerController* PlayerController = GetFirstLocalPlayerController();
+	// if (!PlayerController) return;
+	// PlayerController->ClientTravel(IpAddress, ETravelType::TRAVEL_Absolute);
 }
 
 void UPuzzlePlatformsGameInstance::LoadMenu()

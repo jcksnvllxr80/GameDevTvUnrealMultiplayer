@@ -19,6 +19,7 @@ protected:
 	
 public:
 	UMainMenu(const FObjectInitializer & ObjectInitializer);
+	void SetServerList(TArray<FString> ServerNames);
 
 private:
 	TSubclassOf<class UUserWidget> ServerRowClass = nullptr;

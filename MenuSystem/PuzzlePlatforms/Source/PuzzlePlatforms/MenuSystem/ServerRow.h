@@ -13,5 +13,9 @@ UCLASS()
 class PUZZLEPLATFORMS_API UServerRow : public UUserWidget
 {
 	GENERATED_BODY()
+
+public:
+	UPROPERTY(meta = (BindWidget))
+	class UTextBlock* ServerListItem;
 	
 };
