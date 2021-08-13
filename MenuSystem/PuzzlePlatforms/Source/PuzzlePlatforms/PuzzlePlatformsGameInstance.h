@@ -23,6 +23,7 @@ public:
 	UPuzzlePlatformsGameInstance(const FObjectInitializer & ObjectInitializer);
 	virtual void Init();
 	virtual void LoadMainMenu() override;
+	void RefreshServerList() override;
 
 	UFUNCTION(Exec)
 	void Host() override;

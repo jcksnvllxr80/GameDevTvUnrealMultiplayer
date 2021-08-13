@@ -128,10 +128,19 @@ void UMainMenu::OpenJoinMenu()
 		if (JoinMenu)
 		{
 			MenuSwitcher->SetActiveWidget(JoinMenu);
+			if (MenuInterface)
+			{
+				MenuInterface->RefreshServerList();
+			}
+			else
+			{
+				UE_LOG(LogTemp, Error, TEXT("No Menu interface!"));
+				return;
+			}
 		}
 		else
 		{
-			UE_LOG(LogTemp, Error, TEXT("OPEN JKOIN MENU FAILED! Cant find the JoinMenu Widget."));
+			UE_LOG(LogTemp, Error, TEXT("OPEN JOIN MENU FAILED! Cant find the JoinMenu Widget."));
 			return;
 		}
 	}

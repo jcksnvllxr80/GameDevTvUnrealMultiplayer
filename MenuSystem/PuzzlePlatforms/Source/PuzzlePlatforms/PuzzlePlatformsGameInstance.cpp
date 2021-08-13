@@ -52,7 +52,23 @@ void UPuzzlePlatformsGameInstance::Init()
 		this, &UPuzzlePlatformsGameInstance::OnDestroySessionComplete);
 	SessionInterface->OnFindSessionsCompleteDelegates.AddUObject(
 	this, &UPuzzlePlatformsGameInstance::OnFindSessionsComplete);
+}
 
+void UPuzzlePlatformsGameInstance::LoadMainMenu()
+{
+	APlayerController* PlayerController = GetFirstLocalPlayerController();
+	if (!PlayerController) return;
+	PlayerController->ClientTravel("/Game/MenuSystem/MainMenu", ETravelType::TRAVEL_Absolute);
+}
+
+void UPuzzlePlatformsGameInstance::RefreshServerList()
+{
+	if (!SessionInterface.IsValid())
+	{
+		UE_LOG(LogTemp, Error, TEXT("Cant find SessionInterface, exiting RefreshServerList early."));
+		return;
+	}
+	
 	GameSessionSearch = MakeShareable(new FOnlineSessionSearch());
 	if (!GameSessionSearch.IsValid())
 	{
@@ -63,13 +79,6 @@ void UPuzzlePlatformsGameInstance::Init()
 	// GameSessionSearch->QuerySettings.Set(key, value);  // will use in the future with steam
 	UE_LOG(LogTemp, Display, TEXT("Starting session search."));
 	SessionInterface->FindSessions(0, GameSessionSearch.ToSharedRef());
-}
-
-void UPuzzlePlatformsGameInstance::LoadMainMenu()
-{
-	APlayerController* PlayerController = GetFirstLocalPlayerController();
-	if (!PlayerController) return;
-	PlayerController->ClientTravel("/Game/MenuSystem/MainMenu", ETravelType::TRAVEL_Absolute);
 }
 
 void UPuzzlePlatformsGameInstance::Host()
@@ -191,11 +200,14 @@ void UPuzzlePlatformsGameInstance::OnFindSessionsComplete(bool Success)
 		TArray<FOnlineSessionSearchResult> SessionSearchResults = GameSessionSearch->SearchResults;
 		if (SessionSearchResults.Num() > 0)
 		{
+			TArray<FString> ServerNames;
 			for (const FOnlineSessionSearchResult& SessionSearchResult : SessionSearchResults)
 			{
 				UE_LOG(LogTemp, Display, TEXT("Found session, %s with ping: %i ms."),
 					*SessionSearchResult.GetSessionIdStr(), SessionSearchResult.PingInMs);
+				ServerNames.Add(SessionSearchResult.GetSessionIdStr());
 			}
+			Menu->SetServerList(ServerNames);
 		}
 		else
 		{
