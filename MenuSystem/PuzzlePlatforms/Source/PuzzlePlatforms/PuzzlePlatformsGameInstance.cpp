@@ -106,7 +106,7 @@ void UPuzzlePlatformsGameInstance::Join(FString& IpAddress)
 	// UEngine* Engine = GetEngine();
 	// if (!Engine) return;
 	// Engine->AddOnScreenDebugMessage(0,5,FColor::Green,
-	// 	FString::Printf(TEXT("Joining %s"), *IpAddress));
+	// FString::Printf(TEXT("Joining %s"), *IpAddress));
 	//
 	// APlayerController* PlayerController = GetFirstLocalPlayerController();
 	// if (!PlayerController) return;

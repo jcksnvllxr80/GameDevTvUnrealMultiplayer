@@ -51,6 +51,9 @@ private:
 	UPROPERTY(meta = (BindWidget))
 	class UWidget* JoinMenu;
 
+	UPROPERTY(meta = (BindWidget))
+	class UButton* BackButton;
+
 	UFUNCTION()
 	void HostServer();
 
@@ -62,4 +65,7 @@ private:
 
 	UFUNCTION()
 	void QuitGame();
+
+	UFUNCTION()
+	void BackToMainMenu();
 };

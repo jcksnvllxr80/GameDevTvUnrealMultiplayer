@@ -54,6 +54,17 @@ bool UMainMenu::Initialize()
 		return false;
 	}
 
+		
+	if (BackButton)
+	{
+		BackButton->OnClicked.AddDynamic(this, &UMainMenu::BackToMainMenu);
+	}
+	else
+	{
+		UE_LOG(LogTemp, Error, TEXT("INIT FAILED! Cant find the Back button during init."));
+		return false;
+	}
+
 	UE_LOG(LogTemp, Display, TEXT("Main Menu Init complete!"));
 	return true;
 }
@@ -193,5 +204,25 @@ void UMainMenu::QuitGame()
 		UE_LOG(LogTemp, Error, TEXT("Cant find World."));
 		return;
 	}
+}
 
+void UMainMenu::BackToMainMenu()
+{
+	if (MenuSwitcher)
+	{
+		if (MainMenu)
+		{
+			MenuSwitcher->SetActiveWidget(MainMenu);
+		}
+		else
+		{
+			UE_LOG(LogTemp, Error, TEXT("OPEN MAIN MENU FAILED! Cant find the MainMenu Widget."));
+			return;
+		}
+	}
+	else
+	{
+		UE_LOG(LogTemp, Error, TEXT("OPEN MAIN MENU FAILED! Cant find the Menu Switcher OBJ."));
+		return;
+	}
 }
