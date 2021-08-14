@@ -20,6 +20,8 @@ protected:
 public:
 	UMainMenu(const FObjectInitializer & ObjectInitializer);
 	void SetServerList(TArray<FString> ServerNames);
+	TOptional<uint32> GetSelectedIndex() const;
+	void SetSelectedIndex(const TOptional<uint32>& SelectedIndex);
 
 private:
 	TSubclassOf<class UUserWidget> ServerRowClass = nullptr;
@@ -36,8 +38,8 @@ private:
 	UPROPERTY(meta = (BindWidget))
 	class UButton* DesktopButton;
 
-	// UPROPERTY(meta = (BindWidget))
-	// class UEditableText* HostIpAddress;
+	UPROPERTY(meta = (BindWidget))
+	class UEditableText* HostIpAddress;
 
 	UPROPERTY(meta = (BindWidget))
 	class UPanelWidget* ServerList;
@@ -68,4 +70,6 @@ private:
 
 	UFUNCTION()
 	void BackToMainMenu();
+
+	TOptional<uint32> SelectedIndex;
 };

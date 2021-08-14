@@ -85,6 +85,7 @@ void UMainMenu::SetServerList(TArray<FString> ServerNames)
 		UWorld* World = this->GetWorld();
 		if (World)
 		{
+			uint32 i = 0;
 			ServerList->ClearChildren();
 			for (const FString& ServerName : ServerNames)
 			{
@@ -94,6 +95,9 @@ void UMainMenu::SetServerList(TArray<FString> ServerNames)
 					if (ServerList)
 					{
 						ServerRow->ServerListItem->SetText(FText::FromString(ServerName));
+						ServerRow->Setup(this, i);
+						++i;
+						
 						ServerList->AddChild(ServerRow);
 					}
 					else
@@ -166,19 +170,33 @@ void UMainMenu::JoinServer()
 {
 	if (MenuInterface)
 	{
-		// if (HostIpAddress)
-		if (true) // TODO: fix this always true
-		{
-			// FString IpAddress = HostIpAddress->GetText().ToString();
-			// MenuInterface->Join(IpAddress);
-			FString Temp = TEXT("asdf");
-			MenuInterface->Join(Temp);
-		}
-		else
-		{
-			UE_LOG(LogTemp, Error, TEXT("JOIN SERVER FAILED! Cant find the HostIpAddress Widget."));
-			return;
-		}
+        if (HostIpAddress)
+        {
+            FString IpAddress = HostIpAddress->GetText().ToString();
+            if (!IpAddress.IsEmpty())
+            {
+                MenuInterface->JoinIP(IpAddress);	
+            }
+            else
+            {
+                UE_LOG(LogTemp, Display, TEXT("IP Address field is empty. Trying server list item."));
+            	if (SelectedIndex.IsSet()) 
+            	{
+            		UE_LOG(LogTemp, Warning, TEXT("Joining server index: %i"), SelectedIndex.GetValue());
+            		MenuInterface->Join(SelectedIndex.GetValue());
+            	}
+            	else
+            	{
+            		UE_LOG(LogTemp, Error, TEXT("JOIN SERVER FAILED! Cant find a server to join."));
+            		return;
+            	}
+            }
+        }
+        else
+        {
+            UE_LOG(LogTemp, Error, TEXT("JOIN SERVER FAILED! Cant find the HostIpAddress Widget."));
+            return;
+        }
 	}
 }
 
@@ -225,4 +243,14 @@ void UMainMenu::BackToMainMenu()
 		UE_LOG(LogTemp, Error, TEXT("OPEN MAIN MENU FAILED! Cant find the Menu Switcher OBJ."));
 		return;
 	}
+}
+
+TOptional<uint32> UMainMenu::GetSelectedIndex() const
+{
+	return SelectedIndex;
+}
+
+void UMainMenu::SetSelectedIndex(const TOptional<uint32>& Index)
+{
+	SelectedIndex = Index;
 }

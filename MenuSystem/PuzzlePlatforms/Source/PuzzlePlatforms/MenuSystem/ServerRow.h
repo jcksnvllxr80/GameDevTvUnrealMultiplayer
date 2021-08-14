@@ -17,5 +17,19 @@ class PUZZLEPLATFORMS_API UServerRow : public UUserWidget
 public:
 	UPROPERTY(meta = (BindWidget))
 	class UTextBlock* ServerListItem;
+
+	void Setup(class UMainMenu* InParent, uint32 InIndex);
+
+private:
+	UPROPERTY(meta = (BindWidget))
+	class UButton* RowButton;
+
+	UPROPERTY()
+	class UMainMenu* Parent;
+
+	uint32 Index;
+
+	UFUNCTION()
+	void OnClicked();
 	
 };

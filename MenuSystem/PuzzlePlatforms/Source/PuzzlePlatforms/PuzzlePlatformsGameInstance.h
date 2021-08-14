@@ -8,6 +8,7 @@
 #include "Engine/GameInstance.h"
 #include "MenuSystem/MenuInterface.h"
 #include "OnlineSubsystem.h"
+#include "Interfaces/OnlineSessionInterface.h"
 #include "PuzzlePlatformsGameInstance.generated.h"
 
 
@@ -29,7 +30,10 @@ public:
 	void Host() override;
 
 	UFUNCTION(Exec)
-	void Join(FString& IpAddress) override;
+	void JoinIP(FString& IpAddress) override;
+
+	UFUNCTION(Exec)
+	void Join(uint32 Index) override;
 
 	UFUNCTION(BlueprintCallable)
 	void LoadMenu();
@@ -46,5 +50,6 @@ private:
 	void OnGameSessionComplete(FName SessionName, bool Success);
 	void OnDestroySessionComplete(FName SessionName, bool Success);
 	void OnFindSessionsComplete(bool Success);
+	void OnJoinSessionComplete(FName SessionName, EOnJoinSessionCompleteResult::Type Result);
 	void CreateSession();
 };

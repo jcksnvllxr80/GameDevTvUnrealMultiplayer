@@ -51,7 +51,9 @@ void UPuzzlePlatformsGameInstance::Init()
 	SessionInterface->OnDestroySessionCompleteDelegates.AddUObject(
 		this, &UPuzzlePlatformsGameInstance::OnDestroySessionComplete);
 	SessionInterface->OnFindSessionsCompleteDelegates.AddUObject(
-	this, &UPuzzlePlatformsGameInstance::OnFindSessionsComplete);
+		this, &UPuzzlePlatformsGameInstance::OnFindSessionsComplete);
+	SessionInterface->OnJoinSessionCompleteDelegates.AddUObject(
+		this, &UPuzzlePlatformsGameInstance::OnJoinSessionComplete);
 }
 
 void UPuzzlePlatformsGameInstance::LoadMainMenu()
@@ -97,20 +99,38 @@ void UPuzzlePlatformsGameInstance::Host()
 	SessionInterface->DestroySession(SESSION_NAME);
 }
 
-void UPuzzlePlatformsGameInstance::Join(FString& IpAddress)
+void UPuzzlePlatformsGameInstance::JoinIP(FString& IpAddress)
 {
-	if (Menu)
+	UEngine* Engine = GetEngine();
+	if (!Engine) return;
+	Engine->AddOnScreenDebugMessage(0,5,FColor::Green,
+	FString::Printf(TEXT("Joining %s"), *IpAddress));
+	
+	APlayerController* PlayerController = GetFirstLocalPlayerController();
+	if (!PlayerController) return;
+	PlayerController->ClientTravel(IpAddress, ETravelType::TRAVEL_Absolute);
+}
+
+void UPuzzlePlatformsGameInstance::Join(uint32 Index)
+{
+	if (SessionInterface.IsValid())
 	{
-		Menu->SetServerList({"Test1", "Test2"});
+		if (GameSessionSearch.IsValid())
+		{
+			SessionInterface->JoinSession(0, SESSION_NAME, GameSessionSearch->SearchResults[Index]);
+		}
+		else
+		{
+			UE_LOG(LogTemp, Error, TEXT("Game session search is not valid, cant join a server."));
+			return;
+		}
 	}
-	// UEngine* Engine = GetEngine();
-	// if (!Engine) return;
-	// Engine->AddOnScreenDebugMessage(0,5,FColor::Green,
-	// FString::Printf(TEXT("Joining %s"), *IpAddress));
-	//
-	// APlayerController* PlayerController = GetFirstLocalPlayerController();
-	// if (!PlayerController) return;
-	// PlayerController->ClientTravel(IpAddress, ETravelType::TRAVEL_Absolute);
+	else
+	{
+		UE_LOG(LogTemp, Error, TEXT("Session interface is not valid, cant join a server."));
+		return;
+	}
+
 }
 
 void UPuzzlePlatformsGameInstance::LoadMenu()
@@ -218,6 +238,34 @@ void UPuzzlePlatformsGameInstance::OnFindSessionsComplete(bool Success)
 	{
 		UE_LOG(LogTemp, Warning, TEXT("Game session search was not successful."));
 	}
+}
+
+void UPuzzlePlatformsGameInstance::OnJoinSessionComplete(FName SessionName, EOnJoinSessionCompleteResult::Type Result)
+{
+	if (SessionInterface.IsValid())
+	{
+		FString Address;
+		if (!SessionInterface->GetResolvedConnectString(SessionName, Address))
+		{
+			UE_LOG(LogTemp, Warning, TEXT("Could not get connect string."));
+			return;
+		}
+		
+		UEngine* Engine = GetEngine();
+		if (!Engine) return;
+		Engine->AddOnScreenDebugMessage(0,5,FColor::Green,
+		FString::Printf(TEXT("Joining session %s"), *SessionName.ToString()));
+	
+		APlayerController* PlayerController = GetFirstLocalPlayerController();
+		if (!PlayerController) return;
+		PlayerController->ClientTravel(Address, ETravelType::TRAVEL_Absolute);
+	}
+	else
+	{
+		UE_LOG(LogTemp, Error, TEXT("SessionInterface is not valid. Cant get find join session."));
+		return;
+	}
+
 }
 
 void UPuzzlePlatformsGameInstance::CreateSession()
