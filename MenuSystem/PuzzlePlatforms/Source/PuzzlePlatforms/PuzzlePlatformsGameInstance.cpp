@@ -78,7 +78,8 @@ void UPuzzlePlatformsGameInstance::RefreshServerList()
 		return;
 	}
 	// GameSessionSearch->bIsLanQuery = true;
-	// GameSessionSearch->QuerySettings.Set(key, value);  // will use in the future with steam
+	GameSessionSearch->MaxSearchResults = 100;
+	GameSessionSearch->QuerySettings.Set(SEARCH_PRESENCE, true, EOnlineComparisonOp::Equals); 
 	UE_LOG(LogTemp, Display, TEXT("Starting session search."));
 	SessionInterface->FindSessions(0, GameSessionSearch.ToSharedRef());
 }
@@ -277,6 +278,7 @@ void UPuzzlePlatformsGameInstance::CreateSession()
 		SessionSettings.bIsLANMatch = true;
 		SessionSettings.NumPublicConnections = 2;
 		SessionSettings.bShouldAdvertise = true;
+		SessionSettings.bUsesPresence = true;
 		SessionInterface->CreateSession(0, SESSION_NAME, SessionSettings);
 	}
 }
