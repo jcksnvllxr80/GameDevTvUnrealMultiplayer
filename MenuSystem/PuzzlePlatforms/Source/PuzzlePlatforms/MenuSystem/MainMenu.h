@@ -72,4 +72,6 @@ private:
 	void BackToMainMenu();
 
 	TOptional<uint32> SelectedIndex;
+
+	void UpdateChildrenRows();
 };

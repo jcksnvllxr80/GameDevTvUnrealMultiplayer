@@ -253,4 +253,20 @@ TOptional<uint32> UMainMenu::GetSelectedIndex() const
 void UMainMenu::SetSelectedIndex(const TOptional<uint32>& Index)
 {
 	SelectedIndex = Index;
+	UpdateChildrenRows();
+}
+
+void UMainMenu::UpdateChildrenRows()
+{
+	if (ServerList)
+	{
+		for (UWidget* CurrentWidget : ServerList->GetAllChildren())
+		{
+			auto Row = Cast<UServerRow>(CurrentWidget);
+			if (Row)
+			{
+				Row->Selected = (SelectedIndex.IsSet() && (SelectedIndex.GetValue() == ServerList->GetChildIndex(Row)));
+			}
+		}
+	}
 }
