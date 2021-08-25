@@ -54,6 +54,9 @@ Then...
 Finally...
 - Launch a game to connect to the server in the same way as shown above in the [Launch a client to connect to the server](#Launch-a-client-to-connect-to-the-server) section
 
+NOTE: to not use steam online subsystem...
+- & "C:\Program Files\UE_4.26\Engine\Binaries\Win64\UE4Editor.exe" "C:\Users\A-A-Ron\git\GameDevTvUnrealMultiplayer\MenuSystem\PuzzlePlatforms\PuzzlePlatforms.uproject" -game -log -nosteam
+
 ----
 
 ## Play with friends over the internet without port forwarding
