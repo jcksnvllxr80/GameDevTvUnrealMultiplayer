@@ -5,6 +5,7 @@
 #include "CoreMinimal.h"
 #include "MenuWidget.h"
 #include "Components/Button.h"
+#include "PuzzlePlatforms/PuzzlePlatformsGameInstance.h"
 #include "MainMenu.generated.h"
 
 /**
@@ -19,7 +20,7 @@ protected:
 	
 public:
 	UMainMenu(const FObjectInitializer & ObjectInitializer);
-	void SetServerList(TArray<FString> ServerNames);
+	void SetServerList(TArray<FServerData> ServersData);
 	TOptional<uint32> GetSelectedIndex() const;
 	void SetSelectedIndex(const TOptional<uint32>& SelectedIndex);
 

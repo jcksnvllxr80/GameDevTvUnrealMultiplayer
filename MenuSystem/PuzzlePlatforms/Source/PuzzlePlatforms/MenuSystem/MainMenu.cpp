@@ -76,7 +76,7 @@ UMainMenu::UMainMenu(const FObjectInitializer & ObjectInitializer)
 	ServerRowClass = ServerRowBPClass.Class;
 }
 
-void UMainMenu::SetServerList(TArray<FString> ServerNames)
+void UMainMenu::SetServerList(TArray<FServerData> ServersData)
 {
 	UE_LOG(LogTemp, Display, TEXT("Adding available servers to server list."))
 	if (ServerRowClass)
@@ -87,14 +87,18 @@ void UMainMenu::SetServerList(TArray<FString> ServerNames)
 		{
 			uint32 i = 0;
 			ServerList->ClearChildren();
-			for (const FString& ServerName : ServerNames)
+			for (const FServerData& ServerData : ServersData)
 			{
 				UServerRow* ServerRow = CreateWidget<UServerRow>(World, ServerRowClass);
 				if (ServerRow)
 				{
 					if (ServerList)
 					{
-						ServerRow->ServerListItem->SetText(FText::FromString(ServerName));
+						ServerRow->ServerListItem->SetText(FText::FromString(ServerData.ServerName));
+						ServerRow->HostUser->SetText(FText::FromString(ServerData.HostUserName));
+						FString FractionText = FString::Printf(TEXT("%d/%d"),
+							ServerData.CurrentPlayers, ServerData.MaxPlayers);
+						ServerRow->ConnectionFraction->SetText(FText::FromString(FractionText));
 						ServerRow->Setup(this, i);
 						++i;
 						

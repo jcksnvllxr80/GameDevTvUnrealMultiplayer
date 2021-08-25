@@ -17,6 +17,13 @@ class PUZZLEPLATFORMS_API UServerRow : public UUserWidget
 public:
 	UPROPERTY(meta = (BindWidget))
 	class UTextBlock* ServerListItem;
+
+	UPROPERTY(meta = (BindWidget))
+	class UTextBlock* HostUser;
+
+	UPROPERTY(meta = (BindWidget))
+	class UTextBlock* ConnectionFraction;
+	
 	UPROPERTY(BlueprintReadOnly)
 	bool Selected = false;
 

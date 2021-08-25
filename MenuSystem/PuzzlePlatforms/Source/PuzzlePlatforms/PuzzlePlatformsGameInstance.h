@@ -11,6 +11,16 @@
 #include "Interfaces/OnlineSessionInterface.h"
 #include "PuzzlePlatformsGameInstance.generated.h"
 
+USTRUCT()
+struct FServerData
+{
+	GENERATED_BODY()
+	FString ServerName;
+	uint16 CurrentPlayers;
+	uint16 MaxPlayers;
+	FString HostUserName;
+	
+};
 
 /**
  * 
