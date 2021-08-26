@@ -37,7 +37,7 @@ public:
 	void RefreshServerList() override;
 
 	UFUNCTION(Exec)
-	void Host() override;
+	void Host(FString ServerName) override;
 
 	UFUNCTION(Exec)
 	void JoinIP(FString& IpAddress) override;
@@ -61,5 +61,7 @@ private:
 	void OnDestroySessionComplete(FName SessionName, bool Success);
 	void OnFindSessionsComplete(bool Success);
 	void OnJoinSessionComplete(FName SessionName, EOnJoinSessionCompleteResult::Type Result);
+
+	FString DesiredServerName;
 	void CreateSession();
 };

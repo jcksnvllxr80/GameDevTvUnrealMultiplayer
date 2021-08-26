@@ -43,6 +43,9 @@ private:
 	class UEditableText* HostIpAddress;
 
 	UPROPERTY(meta = (BindWidget))
+	class UEditableText* CustomServerName;
+
+	UPROPERTY(meta = (BindWidget))
 	class UPanelWidget* ServerList;
 
 	UPROPERTY(meta = (BindWidget))

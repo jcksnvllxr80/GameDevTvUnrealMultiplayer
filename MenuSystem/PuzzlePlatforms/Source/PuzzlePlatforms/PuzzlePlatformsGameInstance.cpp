@@ -16,6 +16,7 @@
 #include "PlatformTrigger.h"
 
 const static FName SESSION_NAME = TEXT("My Session Game");
+const static FName SERVER_NAME_SESSION_KEY = TEXT("CustomServerName");
 
 UPuzzlePlatformsGameInstance::UPuzzlePlatformsGameInstance(const FObjectInitializer & ObjectInitializer)
 {
@@ -84,8 +85,9 @@ void UPuzzlePlatformsGameInstance::RefreshServerList()
 	SessionInterface->FindSessions(0, GameSessionSearch.ToSharedRef());
 }
 
-void UPuzzlePlatformsGameInstance::Host()
+void UPuzzlePlatformsGameInstance::Host(FString ServerName)
 {
+	DesiredServerName = ServerName;
 	if (!SessionInterface.IsValid())
 	{
 		UE_LOG(LogTemp, Error, TEXT("There is no SessionInterface, exiting Host func early."));
@@ -227,11 +229,28 @@ void UPuzzlePlatformsGameInstance::OnFindSessionsComplete(bool Success)
 				UE_LOG(LogTemp, Display, TEXT("Found session, %s with ping: %i ms."),
 					*SessionSearchResult.GetSessionIdStr(), SessionSearchResult.PingInMs);
 				FServerData Data;
-				Data.ServerName = SessionSearchResult.GetSessionIdStr();
 				Data.MaxPlayers = SessionSearchResult.Session.SessionSettings.NumPublicConnections;
 				Data.CurrentPlayers = Data.MaxPlayers - SessionSearchResult.Session.NumOpenPublicConnections;
-				
 				Data.HostUserName = SessionSearchResult.Session.OwningUserName;
+				FString CustomServerName;
+				if (SessionSearchResult.Session.SessionSettings.Get(SERVER_NAME_SESSION_KEY, CustomServerName))
+				{
+					if (CustomServerName.IsEmpty())
+					{
+						UE_LOG(LogTemp, Warning, TEXT("Did not find custom server name, using default."));
+						Data.ServerName = SessionSearchResult.GetSessionIdStr();
+					}
+					else
+					{
+						UE_LOG(LogTemp, Display, TEXT("Found custom server name, %s."), *CustomServerName);
+						Data.ServerName = CustomServerName;
+					}
+				}
+				else
+				{
+					UE_LOG(LogTemp, Warning, TEXT("Did not find custom server name, using default."));
+					Data.ServerName = SessionSearchResult.GetSessionIdStr();
+				}
 				ServerData.Add(Data);
 			}
 			Menu->SetServerList(ServerData);
@@ -285,6 +304,11 @@ void UPuzzlePlatformsGameInstance::CreateSession()
 		SessionSettings.NumPublicConnections = 2;
 		SessionSettings.bShouldAdvertise = true;
 		SessionSettings.bUsesPresence = true;
+		if (!DesiredServerName.IsEmpty())
+		{
+			SessionSettings.Set(SERVER_NAME_SESSION_KEY, DesiredServerName,
+				EOnlineDataAdvertisementType::ViaOnlineServiceAndPing);
+		}
 		SessionInterface->CreateSession(0, SESSION_NAME, SessionSettings);
 	}
 }

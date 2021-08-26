@@ -136,7 +136,10 @@ void UMainMenu::HostServer()
 	UE_LOG(LogTemp, Display, TEXT("Hosting a server"))
 	if (MenuInterface)
 	{
-		MenuInterface->Host();
+		if (CustomServerName)
+		{
+			MenuInterface->Host(CustomServerName->GetText().ToString());
+		}
 	}
 }
 
