@@ -14,9 +14,9 @@ bool UMainMenu::Initialize()
 	const bool SuccessfulInit = Super::Initialize();
 	if (!SuccessfulInit) return false;
 	
-	if (HostButton)
+	if (OpenHostMenuButton)
 	{
-		HostButton->OnClicked.AddDynamic(this, &UMainMenu::HostServer);
+		OpenHostMenuButton->OnClicked.AddDynamic(this, &UMainMenu::OpenHostMenu);
 	}
 	else
 	{
@@ -44,6 +44,16 @@ bool UMainMenu::Initialize()
 		return false;
 	}
 
+	if (HostButton)
+	{
+		HostButton->OnClicked.AddDynamic(this, &UMainMenu::HostServer);
+	}
+	else
+	{
+		UE_LOG(LogTemp, Error, TEXT("INIT FAILED! Cant find the Join button during init."));
+		return false;
+	}
+
 	if (DesktopButton)
 	{
 		DesktopButton->OnClicked.AddDynamic(this, &UMainMenu::QuitGame);
@@ -54,14 +64,23 @@ bool UMainMenu::Initialize()
 		return false;
 	}
 
-		
-	if (BackButton)
+	if (BackButtonJoinMenu)
 	{
-		BackButton->OnClicked.AddDynamic(this, &UMainMenu::BackToMainMenu);
+		BackButtonJoinMenu->OnClicked.AddDynamic(this, &UMainMenu::BackToMainMenu);
 	}
 	else
 	{
-		UE_LOG(LogTemp, Error, TEXT("INIT FAILED! Cant find the Back button during init."));
+		UE_LOG(LogTemp, Error, TEXT("INIT FAILED! Cant find the Join menu's Back button during init."));
+		return false;
+	}
+		
+	if (BackButtonHostMenu)
+	{
+		BackButtonHostMenu->OnClicked.AddDynamic(this, &UMainMenu::BackToMainMenu);
+	}
+	else
+	{
+		UE_LOG(LogTemp, Error, TEXT("INIT FAILED! Cant find the Host menu's Back button during init."));
 		return false;
 	}
 
@@ -140,6 +159,27 @@ void UMainMenu::HostServer()
 		{
 			MenuInterface->Host(CustomServerName->GetText().ToString());
 		}
+	}
+}
+
+void UMainMenu::OpenHostMenu()
+{
+	if (MenuSwitcher)
+	{
+		if (HostMenu)
+		{
+			MenuSwitcher->SetActiveWidget(HostMenu);
+		}
+		else
+		{
+			UE_LOG(LogTemp, Error, TEXT("OPEN HOST MENU FAILED! Cant find the HostMenu Widget."));
+			return;
+		}
+	}
+	else
+	{
+		UE_LOG(LogTemp, Error, TEXT("OPEN HOST MENU FAILED! Cant find the Menu Switcher OBJ."));
+		return;
 	}
 }
 
