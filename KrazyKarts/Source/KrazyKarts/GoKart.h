@@ -38,4 +38,5 @@ private:
 	
 	FVector Velocity;
 	void MoveForward(float Value);
+	void UpdateLocationFromVelocity(float DeltaTime);
 };

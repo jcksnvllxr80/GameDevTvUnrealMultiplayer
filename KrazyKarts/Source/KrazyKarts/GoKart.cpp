@@ -19,6 +19,17 @@ void AGoKart::BeginPlay()
 	
 }
 
+void AGoKart::UpdateLocationFromVelocity(float DeltaTime)
+{
+	FVector Translation = Velocity * DeltaTime * 100; // convert from meters to centimeters (* 100)
+	FHitResult VehicleCollision;
+	AddActorWorldOffset(Translation, true, &VehicleCollision);
+	if (VehicleCollision.IsValidBlockingHit())
+	{
+		Velocity = FVector::ZeroVector;  // set velocity to 0
+	}
+}
+
 // Called every frame
 void AGoKart::Tick(float DeltaTime)
 {
@@ -28,8 +39,8 @@ void AGoKart::Tick(float DeltaTime)
 	FVector DeltaVelocity = Acceleration * DeltaTime;
 	Velocity = Velocity + DeltaVelocity;
 	
-	FVector Translation = Velocity * DeltaTime * 100; // convert from meters to centimeters (* 100)
-	AddActorWorldOffset(Translation);
+	UpdateLocationFromVelocity(DeltaTime);
+	
 }
 
 // Called to bind functionality to input
