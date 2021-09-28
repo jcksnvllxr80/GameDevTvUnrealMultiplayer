@@ -34,9 +34,14 @@ private:
 	// force applied to the car when the throttle is fully done in N
 	UPROPERTY(EditAnywhere)
 	float MaxDrivingForce = 10000;
+	UPROPERTY(EditAnywhere)
+	float MaxRotDegPerSec = 90;
 	float Throttle;
+	float SteeringThrow;
 	
 	FVector Velocity;
 	void MoveForward(float Value);
+	void MoveRight(float Value);
 	void UpdateLocationFromVelocity(float DeltaTime);
+	void ApplyRotation(float DeltaTime);
 };
