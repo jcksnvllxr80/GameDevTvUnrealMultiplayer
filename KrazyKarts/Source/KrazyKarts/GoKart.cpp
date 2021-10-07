@@ -43,7 +43,7 @@ void AGoKart::Tick(float DeltaTime)
 {
 	Super::Tick(DeltaTime);
 	FVector Force = GetActorForwardVector() * MaxDrivingForce * Throttle;
-	Force += GetResistance();
+	Force += (GetAirResistance() + GetRollingResistance());
 	FVector Acceleration = Force / Mass;
 	FVector DeltaVelocity = Acceleration * DeltaTime;
 	Velocity = Velocity + DeltaVelocity;
@@ -53,9 +53,15 @@ void AGoKart::Tick(float DeltaTime)
 	
 }
 
-FVector AGoKart::GetResistance()
+FVector AGoKart::GetAirResistance()
 {
 	return -(Velocity.GetSafeNormal() * Velocity.SizeSquared() * DragCoefficient);
+}
+
+FVector AGoKart::GetRollingResistance()
+{
+	float NormalForce = -(GetWorld()->GetGravityZ() / 100) * Mass;
+	return -(Velocity.GetSafeNormal() * NormalForce * RollingResistanceCoefficient);
 }
 
 // Called to bind functionality to input

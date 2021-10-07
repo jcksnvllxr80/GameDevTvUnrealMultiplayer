@@ -27,11 +27,13 @@ public:
 	virtual void SetupPlayerInputComponent(class UInputComponent* PlayerInputComponent) override;
 
 private:
-	FVector GetResistance();
+	FVector GetAirResistance();
+	FVector GetRollingResistance();
 	// Mass of the car in kg
 	UPROPERTY(EditAnywhere)
 	float Mass = 1000;
-
+	UPROPERTY(EditAnywhere)
+	float RollingResistanceCoefficient = 0.015;
 	// force applied to the car when the throttle is fully done in N
 	UPROPERTY(EditAnywhere)
 	float MaxDrivingForce = 10000;
