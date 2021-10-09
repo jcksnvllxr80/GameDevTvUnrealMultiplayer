@@ -19,9 +19,9 @@ void AGoKart::BeginPlay()
 	
 }
 
-void AGoKart::UpdateLocationFromVelocity(float DeltaTime)
+void AGoKart::UpdateLocationFromVelocity(const float DeltaTime)
 {
-	FVector Translation = Velocity * DeltaTime * 100; // convert from meters to centimeters (* 100)
+	const FVector Translation = Velocity * DeltaTime * 100; // convert from meters to centimeters (* 100)
 	FHitResult VehicleCollision;
 	AddActorWorldOffset(Translation, true, &VehicleCollision);
 	if (VehicleCollision.IsValidBlockingHit())
@@ -30,22 +30,23 @@ void AGoKart::UpdateLocationFromVelocity(float DeltaTime)
 	}
 }
 
-void AGoKart::ApplyRotation(float DeltaTime)
-{
-	float RotationAngle = FMath::DegreesToRadians(MaxRotDegPerSec) * DeltaTime * SteeringThrow;
-	FQuat RotationDelta(GetActorUpVector(), RotationAngle);
+void AGoKart::ApplyRotation(const float DeltaTime)
+{ // s = r * theta
+	const float DeltaArcLength = FVector::DotProduct(GetActorForwardVector(), Velocity) * DeltaTime;
+	const float RotationAngle = (DeltaArcLength * SteeringThrow) / TurningRadius;
+	const FQuat RotationDelta(GetActorUpVector(), RotationAngle);
 	Velocity = RotationDelta.RotateVector(Velocity);
 	AddActorWorldRotation(RotationDelta);
 }
 
 // Called every frame
-void AGoKart::Tick(float DeltaTime)
+void AGoKart::Tick(const float DeltaTime)
 {
 	Super::Tick(DeltaTime);
 	FVector Force = GetActorForwardVector() * MaxDrivingForce * Throttle;
 	Force += (GetAirResistance() + GetRollingResistance());
-	FVector Acceleration = Force / Mass;
-	FVector DeltaVelocity = Acceleration * DeltaTime;
+	const FVector Acceleration = Force / Mass;
+	const FVector DeltaVelocity = Acceleration * DeltaTime;
 	Velocity = Velocity + DeltaVelocity;
 
 	ApplyRotation(DeltaTime);
@@ -53,14 +54,14 @@ void AGoKart::Tick(float DeltaTime)
 	
 }
 
-FVector AGoKart::GetAirResistance()
+FVector AGoKart::GetAirResistance() const
 {
 	return -(Velocity.GetSafeNormal() * Velocity.SizeSquared() * DragCoefficient);
 }
 
-FVector AGoKart::GetRollingResistance()
+FVector AGoKart::GetRollingResistance() const
 {
-	float NormalForce = -(GetWorld()->GetGravityZ() / 100) * Mass;
+	const float NormalForce = -(GetWorld()->GetGravityZ() / 100) * Mass;
 	return -(Velocity.GetSafeNormal() * NormalForce * RollingResistanceCoefficient);
 }
 
