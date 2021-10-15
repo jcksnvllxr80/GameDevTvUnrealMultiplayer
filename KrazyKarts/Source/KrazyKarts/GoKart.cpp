@@ -3,6 +3,7 @@
 
 #include "GoKart.h"
 #include "Components/InputComponent.h"
+#include "DrawDebugHelpers.h"
 
 // Sets default values
 AGoKart::AGoKart()
@@ -51,7 +52,11 @@ void AGoKart::Tick(const float DeltaTime)
 
 	ApplyRotation(DeltaTime);
 	UpdateLocationFromVelocity(DeltaTime);
-	
+
+	DrawDebugString(GetWorld(),
+		FVector(0,0,100),
+		UEnum::GetValueAsString(GetLocalRole()),
+		this, FColor::White, DeltaTime);
 }
 
 FVector AGoKart::GetAirResistance() const
@@ -69,9 +74,21 @@ FVector AGoKart::GetRollingResistance() const
 void AGoKart::SetupPlayerInputComponent(UInputComponent* PlayerInputComponent)
 {
 	Super::SetupPlayerInputComponent(PlayerInputComponent);
-	PlayerInputComponent->BindAxis("MoveForward", this, &AGoKart::Server_MoveForward);
-	PlayerInputComponent->BindAxis("MoveRight", this, &AGoKart::Server_MoveRight);
+	PlayerInputComponent->BindAxis("MoveForward", this, &AGoKart::MoveForward);
+	PlayerInputComponent->BindAxis("MoveRight", this, &AGoKart::MoveRight);
 
+}
+
+void AGoKart::MoveForward(float Value)
+{
+	Throttle = Value;
+	Server_MoveForward(Value);
+}
+
+void AGoKart::MoveRight(float Value)
+{
+	SteeringThrow = Value;
+	Server_MoveRight(Value);
 }
 
 void AGoKart::Server_MoveForward_Implementation(float Value)
