@@ -45,6 +45,12 @@ private:
 	float SteeringThrow;
 	
 	FVector Velocity;
+
+	UPROPERTY(Replicated)
+	FVector ReplicatedLocation;
+	UPROPERTY(Replicated)
+	FRotator ReplicatedRotation;
+	
 	UFUNCTION(Server, Reliable, WithValidation)
 	void Server_MoveForward(float Value);
 	void MoveForward(float Value);
