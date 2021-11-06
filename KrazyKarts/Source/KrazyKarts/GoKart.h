@@ -41,15 +41,18 @@ private:
 	float DragCoefficient = 16; // kg/m
 	UPROPERTY(EditAnywhere)
 	float TurningRadius = 10; // m
-	float Throttle;
-	float SteeringThrow;
-	
-	FVector Velocity;
 
 	UPROPERTY(Replicated)
-	FVector ReplicatedLocation;
+	float Throttle;
 	UPROPERTY(Replicated)
-	FRotator ReplicatedRotation;
+	float SteeringThrow;
+	UPROPERTY(Replicated)
+	FVector Velocity;
+
+	UPROPERTY(ReplicatedUsing=OnRep_ReplicatedTransform)
+	FTransform ReplicatedTransform;
+	UFUNCTION()
+	void OnRep_ReplicatedTransform();
 	
 	UFUNCTION(Server, Reliable, WithValidation)
 	void Server_MoveForward(float Value);
