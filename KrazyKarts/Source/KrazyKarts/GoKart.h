@@ -18,12 +18,14 @@ struct FGoKartMove
 	float SteeringThrow;
 
 	UPROPERTY()
-	float deltaTime;
+	float DeltaTime;
 };
 
 USTRUCT()
 struct FGoKartState
 {
+	GENERATED_USTRUCT_BODY()
+	
 	UPROPERTY()
 	FVector Velocity;
 
@@ -70,23 +72,21 @@ private:
 	UPROPERTY(EditAnywhere)
 	float TurningRadius = 10; // m
 
+	UPROPERTY(ReplicatedUsing=OnRep_ServerState)
+	FGoKartState ServerState;
+	
 	UPROPERTY(Replicated)
 	float Throttle;
 	UPROPERTY(Replicated)
 	float SteeringThrow;
-	UPROPERTY(Replicated)
 	FVector Velocity;
-
-	UPROPERTY(ReplicatedUsing=OnRep_ReplicatedTransform)
-	FTransform ReplicatedTransform;
+	
 	UFUNCTION()
-	void OnRep_ReplicatedTransform();
+	void OnRep_ServerState();
 	
 	UFUNCTION(Server, Reliable, WithValidation)
-	void Server_MoveForward(float Value);
+	void Server_SendMove(FGoKartMove Value);
 	void MoveForward(float Value);
-	UFUNCTION(Server, Reliable, WithValidation)
-	void Server_MoveRight(float Value);
 	void MoveRight(float Value);
 	void UpdateLocationFromVelocity(float DeltaTime);
 	void ApplyRotation(float DeltaTime);
