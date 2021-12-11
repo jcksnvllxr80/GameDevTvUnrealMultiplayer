@@ -50,18 +50,43 @@ void AGoKart::ApplyRotation(const float DeltaTime, float SteerThrow)
 	AddActorWorldRotation(RotationDelta);
 }
 
+FGoKartMove AGoKart::CreateMove(float DeltaTime) 
+{
+	FGoKartMove Move;
+	Move.DeltaTime = DeltaTime;
+	Move.SteeringThrow = SteeringThrow;
+	Move.Throttle = Throttle;
+	Move.Time = GetWorld()->TimeSeconds;
+
+	return Move;
+}
+
+void AGoKart::ClearAcknowledgedMoves( FGoKartMove LastMove)
+{
+	TArray<FGoKartMove> NewMoves;
+	for (const FGoKartMove& Move : UnacknowledgedMoves)
+	{
+		if (Move.Time > LastMove.Time)
+		{
+			NewMoves.Add(Move);
+		}
+	}
+	UnacknowledgedMoves = NewMoves;
+}
+
 // Called every frame
 void AGoKart::Tick(const float DeltaTime)
 {
 	Super::Tick(DeltaTime);
 	if (IsLocallyControlled())
 	{
-		FGoKartMove Move;
-		Move.DeltaTime = DeltaTime;
-		Move.SteeringThrow = SteeringThrow;
-		Move.Throttle = Throttle;
-		// TODO: set time
-
+		const FGoKartMove Move = CreateMove(DeltaTime);
+		if (!HasAuthority())
+		{
+			UnacknowledgedMoves.Add(Move);
+			UE_LOG(LogTemp, Warning, TEXT("Queue length: %d"), UnacknowledgedMoves.Num());
+		}
+		
 		Server_SendMove(Move);
 		SimulateMove(Move);
 	}
@@ -109,6 +134,8 @@ void AGoKart::OnRep_ServerState()
 	UE_LOG(LogTemp, Warning, TEXT("Replicated Actor Transform"))
 	SetActorTransform(ServerState.Transform);
 	Velocity = ServerState.Velocity;
+
+	ClearAcknowledgedMoves(ServerState.LastMove);
 }
 
 void AGoKart::MoveForward(float Value)

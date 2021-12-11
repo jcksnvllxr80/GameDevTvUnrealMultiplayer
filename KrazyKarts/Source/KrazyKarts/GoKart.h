@@ -19,6 +19,9 @@ struct FGoKartMove
 
 	UPROPERTY()
 	float DeltaTime;
+
+	UPROPERTY()
+	float Time;
 };
 
 USTRUCT()
@@ -90,4 +93,8 @@ private:
 	void MoveRight(float Value);
 	void UpdateLocationFromVelocity(float DeltaTime);
 	void ApplyRotation(float DeltaTime, float SteerThrow);
+	FGoKartMove CreateMove(float DeltaTime);
+	void ClearAcknowledgedMoves(FGoKartMove LastMove);
+	
+	TArray<FGoKartMove> UnacknowledgedMoves;
 };
