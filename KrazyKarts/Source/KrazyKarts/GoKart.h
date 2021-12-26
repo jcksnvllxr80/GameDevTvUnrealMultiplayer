@@ -60,7 +60,7 @@ public:
 	virtual void SetupPlayerInputComponent(class UInputComponent* PlayerInputComponent) override;
 
 private:
-	void SimulateMove(FGoKartMove);
+	void SimulateMove(const FGoKartMove&);
 	
 	FVector GetAirResistance() const;
 	FVector GetRollingResistance() const;

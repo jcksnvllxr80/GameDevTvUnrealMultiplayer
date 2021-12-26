@@ -78,17 +78,26 @@ void AGoKart::ClearAcknowledgedMoves( FGoKartMove LastMove)
 void AGoKart::Tick(const float DeltaTime)
 {
 	Super::Tick(DeltaTime);
-	if (IsLocallyControlled())
+
+	if (GetLocalRole() == ROLE_AutonomousProxy)
 	{
 		const FGoKartMove Move = CreateMove(DeltaTime);
-		if (!HasAuthority())
-		{
-			UnacknowledgedMoves.Add(Move);
-			UE_LOG(LogTemp, Warning, TEXT("Queue length: %d"), UnacknowledgedMoves.Num());
-		}
-		
-		Server_SendMove(Move);
 		SimulateMove(Move);
+		UnacknowledgedMoves.Add(Move);
+		Server_SendMove(Move);
+	}
+
+	if (GetLocalRole() == ROLE_Authority && GetRemoteRole() == ROLE_SimulatedProxy)
+	{
+		const FGoKartMove Move = CreateMove(DeltaTime);
+		Server_SendMove(Move);
+		UE_LOG(LogTemp, Warning, TEXT("Queue length: %d"), UnacknowledgedMoves.Num());
+		
+	}
+
+	if (GetLocalRole() == ROLE_SimulatedProxy)
+	{
+		SimulateMove(ServerState.LastMove);
 	}
 	
 	DrawDebugString(GetWorld(),
@@ -117,7 +126,7 @@ void AGoKart::SetupPlayerInputComponent(UInputComponent* PlayerInputComponent)
 
 }
 
-void AGoKart::SimulateMove(FGoKartMove Move)
+void AGoKart::SimulateMove(const FGoKartMove& Move)
 {
 	FVector Force = GetActorForwardVector() * MaxDrivingForce * Move.Throttle;
 	Force += (GetAirResistance() + GetRollingResistance());
@@ -136,6 +145,11 @@ void AGoKart::OnRep_ServerState()
 	Velocity = ServerState.Velocity;
 
 	ClearAcknowledgedMoves(ServerState.LastMove);
+
+	for (const FGoKartMove& Move : UnacknowledgedMoves)
+	{
+		SimulateMove(Move);
+	}
 }
 
 void AGoKart::MoveForward(float Value)
