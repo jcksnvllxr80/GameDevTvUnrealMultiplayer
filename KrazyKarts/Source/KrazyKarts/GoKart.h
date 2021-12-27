@@ -4,25 +4,9 @@
 
 #include "CoreMinimal.h"
 #include "GameFramework/Pawn.h"
+#include "GoKartMovementComponent.h"
 #include "GoKart.generated.h"
 
-USTRUCT()
-struct FGoKartMove
-{
-	GENERATED_USTRUCT_BODY()
-	
-	UPROPERTY()
-	float Throttle;
-	
-	UPROPERTY()
-	float SteeringThrow;
-
-	UPROPERTY()
-	float DeltaTime;
-
-	UPROPERTY()
-	float Time;
-};
 
 USTRUCT()
 struct FGoKartState
@@ -60,29 +44,8 @@ public:
 	virtual void SetupPlayerInputComponent(class UInputComponent* PlayerInputComponent) override;
 
 private:
-	void SimulateMove(const FGoKartMove&);
-	
-	FVector GetAirResistance() const;
-	FVector GetRollingResistance() const;
-	// Mass of the car in kg
-	UPROPERTY(EditAnywhere)
-	float Mass = 1000;
-	UPROPERTY(EditAnywhere)
-	float RollingResistanceCoefficient = 0.015;
-	// force applied to the car when the throttle is fully done in N
-	UPROPERTY(EditAnywhere)
-	float MaxDrivingForce = 10000;
-	UPROPERTY(EditAnywhere)
-	float DragCoefficient = 16; // kg/m
-	UPROPERTY(EditAnywhere)
-	float TurningRadius = 10; // m
-
 	UPROPERTY(ReplicatedUsing=OnRep_ServerState)
 	FGoKartState ServerState;
-	
-	float Throttle;
-	float SteeringThrow;
-	FVector Velocity;
 	
 	UFUNCTION()
 	void OnRep_ServerState();
@@ -91,10 +54,10 @@ private:
 	void Server_SendMove(FGoKartMove Value);
 	void MoveForward(float Value);
 	void MoveRight(float Value);
-	void UpdateLocationFromVelocity(float DeltaTime);
-	void ApplyRotation(float DeltaTime, float SteerThrow);
-	FGoKartMove CreateMove(float DeltaTime);
 	void ClearAcknowledgedMoves(FGoKartMove LastMove);
 	
 	TArray<FGoKartMove> UnacknowledgedMoves;
+	
+	UPROPERTY(EditAnywhere)
+	UGoKartMovementComponent* MovementComponent;
 };
