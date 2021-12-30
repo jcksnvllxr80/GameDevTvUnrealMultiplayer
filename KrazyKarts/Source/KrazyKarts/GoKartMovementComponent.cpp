@@ -49,10 +49,21 @@ void UGoKartMovementComponent::SetSteeringThrow(float StThrw)
 	this->SteeringThrow = StThrw;
 }
 
+FGoKartMove UGoKartMovementComponent::GetLastMove() const
+{
+	return LastMove;
+}
+
 // Called every frame
 void UGoKartMovementComponent::TickComponent(float DeltaTime, ELevelTick TickType, FActorComponentTickFunction* ThisTickFunction)
 {
 	Super::TickComponent(DeltaTime, TickType, ThisTickFunction);
+	if (GetOwnerRole() == ROLE_AutonomousProxy || GetOwner()->GetRemoteRole() == ROLE_SimulatedProxy)
+	{
+		LastMove = CreateMove(DeltaTime);
+		SimulateMove(LastMove);
+	}
+
 }
 
 FVector UGoKartMovementComponent::GetAirResistance() const

@@ -44,7 +44,8 @@ public:
 	void SetThrottle(float Throttle);
 	float GetSteeringThrow() const;
 	void SetSteeringThrow(float SteeringThrow);
-	
+	FGoKartMove GetLastMove() const;
+
 protected:
 	// Called when the game starts
 	virtual void BeginPlay() override;
@@ -59,6 +60,7 @@ private:
 	float Throttle;
 	float SteeringThrow;
 	FVector Velocity;
+	FGoKartMove LastMove;
 	
 	// Mass of the car in kg
 	UPROPERTY(EditAnywhere)

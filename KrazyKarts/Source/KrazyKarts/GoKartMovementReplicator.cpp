@@ -30,21 +30,18 @@ void UGoKartMovementReplicator::TickComponent(float DeltaTime, ELevelTick TickTy
 	Super::TickComponent(DeltaTime, TickType, ThisTickFunction);
 
 	if (MovementComponent == nullptr) return;
-
+	FGoKartMove LastMove = MovementComponent->GetLastMove();
+	
 	if (GetOwnerRole() == ROLE_AutonomousProxy)
 	{
-		const FGoKartMove Move = MovementComponent->CreateMove(DeltaTime);
-		MovementComponent->SimulateMove(Move);
-		AddUnacknowledgedMove(Move);
-		Server_SendMove(Move);
+		AddUnacknowledgedMove(LastMove);
+		Server_SendMove(LastMove);
 	}
 
-	if (GetOwnerRole() == ROLE_Authority && GetOwner()->GetRemoteRole() == ROLE_SimulatedProxy)
+	if (GetOwner()->GetRemoteRole() == ROLE_SimulatedProxy)
 	{
-		const FGoKartMove Move = MovementComponent->CreateMove(DeltaTime);
-		Server_SendMove(Move);
-		UE_LOG(LogTemp, Warning, TEXT("Queue length: %d"), GetUnacknowledgedMoves().Num());
-		
+		UpdateServerState(LastMove);
+		// UE_LOG(LogTemp, Warning, TEXT("Queue length: %d"), GetUnacknowledgedMoves().Num());
 	}
 
 	if (GetOwnerRole() == ROLE_SimulatedProxy)
@@ -61,6 +58,13 @@ FGoKartState UGoKartMovementReplicator::GetServerState() const
 void UGoKartMovementReplicator::SetServerState(const FGoKartState& Value)
 {
 	this->ServerState = Value;
+}
+
+void UGoKartMovementReplicator::UpdateServerState(const FGoKartMove& Move)
+{
+	ServerState.LastMove = Move;
+	ServerState.Transform = GetOwner()->GetActorTransform();
+	ServerState.Velocity = MovementComponent->GetVelocity();
 }
 
 TArray<FGoKartMove> UGoKartMovementReplicator::GetUnacknowledgedMoves() const
@@ -112,14 +116,10 @@ void UGoKartMovementReplicator::Server_SendMove_Implementation(FGoKartMove Move)
 {
 	if (MovementComponent == nullptr) return;
 	MovementComponent->SimulateMove(Move);
-	ServerState.LastMove = Move;
-	ServerState.Transform = GetOwner()->GetActorTransform();
-	ServerState.Velocity = MovementComponent->GetVelocity();
+	UpdateServerState(Move);
 }
 
 bool UGoKartMovementReplicator::Server_SendMove_Validate(FGoKartMove Move)
 {
 	return true; // TODO: make better validation
 }
-
-

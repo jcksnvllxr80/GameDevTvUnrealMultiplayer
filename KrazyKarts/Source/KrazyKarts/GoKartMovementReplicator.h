@@ -36,7 +36,6 @@ public:
 	void Server_SendMove(FGoKartMove Value);
 
 	FGoKartState GetServerState() const;
-	void SetServerState(const FGoKartState& ServerState);
 	TArray<FGoKartMove> GetUnacknowledgedMoves() const;
 	void AddUnacknowledgedMove(const FGoKartMove& Move);
 
@@ -54,4 +53,6 @@ private:
 	UFUNCTION()
 	void OnRep_ServerState();
 	void ClearAcknowledgedMoves(FGoKartMove LastMove);
+	void SetServerState(const FGoKartState& ServerState);
+	void UpdateServerState(const FGoKartMove& Move);
 };
