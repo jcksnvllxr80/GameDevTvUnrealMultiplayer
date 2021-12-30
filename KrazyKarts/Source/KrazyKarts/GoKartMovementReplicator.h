@@ -50,6 +50,8 @@ private:
 	float ClientTimeSinceUpdate;
 	float ClientTimeBtwnLastUpdates;
 	FTransform ClientStartTransform;
+	FVector ClientStartVelocity;
+	
 	UPROPERTY()
 	UGoKartMovementComponent* MovementComponent;
 

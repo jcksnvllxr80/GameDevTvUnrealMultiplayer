@@ -72,13 +72,21 @@ void UGoKartMovementReplicator::ClientTick(float DeltaTime)
 {
 	ClientTimeSinceUpdate += DeltaTime;
 	if (ClientTimeBtwnLastUpdates < KINDA_SMALL_NUMBER) return;
+	if (MovementComponent == nullptr) return;
 	const float LerpRatio = ClientTimeSinceUpdate / ClientTimeBtwnLastUpdates;
-	
 	const FVector TargetLocation = GetServerState().Transform.GetLocation();
 	const FQuat TargetRotation = GetServerState().Transform.GetRotation();
 	const FVector StartLocation = ClientStartTransform.GetLocation();
 	const FQuat StartRotation = ClientStartTransform.GetRotation();
-	GetOwner()->SetActorLocation(FMath::LerpStable(StartLocation, TargetLocation, LerpRatio));
+	const float VelocityToDerivative = ClientTimeBtwnLastUpdates * 100;  // convert m to cm
+	const FVector StartDerivative = ClientStartVelocity;
+	const FVector TargetDerivative = ServerState.Velocity * VelocityToDerivative;
+	GetOwner()->SetActorLocation(FMath::CubicInterp(
+		StartLocation,StartDerivative, TargetLocation, TargetDerivative, LerpRatio));
+	const FVector NewDerivative = FMath::CubicInterpDerivative(
+		StartLocation,StartDerivative, TargetLocation, TargetDerivative, LerpRatio);
+	FVector NewVelocity = NewDerivative / VelocityToDerivative;
+	
 	GetOwner()->SetActorRotation(FQuat::Slerp(StartRotation, TargetRotation, LerpRatio));
 }
 
@@ -128,10 +136,13 @@ void UGoKartMovementReplicator::OnRep_ServerState()
 
 void UGoKartMovementReplicator::SimulatedProxy_OnRep_ServerState()
 {
+	if (MovementComponent == nullptr) return;
 	ClientTimeBtwnLastUpdates = ClientTimeSinceUpdate;
 	ClientTimeSinceUpdate = 0;
 
 	ClientStartTransform = GetOwner()->GetActorTransform();
+	ClientStartVelocity = MovementComponent->GetVelocity();
+
 }
 
 void UGoKartMovementReplicator::AutonomousProxy_OnRep_ServerState()
