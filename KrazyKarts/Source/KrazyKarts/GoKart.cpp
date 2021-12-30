@@ -4,7 +4,6 @@
 #include "GoKart.h"
 #include "Components/InputComponent.h"
 #include "DrawDebugHelpers.h"
-#include "Net/UnrealNetwork.h"
 
 // Sets default values
 AGoKart::AGoKart()
@@ -14,6 +13,7 @@ AGoKart::AGoKart()
 	bReplicates = true;
 
 	MovementComponent = CreateDefaultSubobject<UGoKartMovementComponent>(TEXT("MovementComponent"));
+	MovementReplicator = CreateDefaultSubobject<UGoKartMovementReplicator>(TEXT("MovementReplicator"));
 }
 
 // Called when the game starts or when spawned
@@ -26,52 +26,10 @@ void AGoKart::BeginPlay()
 	}
 }
 
-void AGoKart::GetLifetimeReplicatedProps( TArray< FLifetimeProperty > & OutLifetimeProps ) const
-{
-	Super::GetLifetimeReplicatedProps(OutLifetimeProps);
-	DOREPLIFETIME( AGoKart, ServerState );
-}
-
-void AGoKart::ClearAcknowledgedMoves( FGoKartMove LastMove)
-{
-	TArray<FGoKartMove> NewMoves;
-	for (const FGoKartMove& Move : UnacknowledgedMoves)
-	{
-		if (Move.Time > LastMove.Time)
-		{
-			NewMoves.Add(Move);
-		}
-	}
-	UnacknowledgedMoves = NewMoves;
-}
-
 // Called every frame
 void AGoKart::Tick(const float DeltaTime)
 {
 	Super::Tick(DeltaTime);
-
-	if (MovementComponent == nullptr) return;
-
-	if (GetLocalRole() == ROLE_AutonomousProxy)
-	{
-		const FGoKartMove Move = MovementComponent->CreateMove(DeltaTime);
-		MovementComponent->SimulateMove(Move);
-		UnacknowledgedMoves.Add(Move);
-		Server_SendMove(Move);
-	}
-
-	if (GetLocalRole() == ROLE_Authority && GetRemoteRole() == ROLE_SimulatedProxy)
-	{
-		const FGoKartMove Move = MovementComponent->CreateMove(DeltaTime);
-		Server_SendMove(Move);
-		UE_LOG(LogTemp, Warning, TEXT("Queue length: %d"), UnacknowledgedMoves.Num());
-		
-	}
-
-	if (GetLocalRole() == ROLE_SimulatedProxy)
-	{
-		MovementComponent->SimulateMove(ServerState.LastMove);
-	}
 	
 	DrawDebugString(GetWorld(),
 		FVector(0,0,100),
@@ -88,22 +46,6 @@ void AGoKart::SetupPlayerInputComponent(UInputComponent* PlayerInputComponent)
 
 }
 
-void AGoKart::OnRep_ServerState()
-{
-	if (MovementComponent == nullptr) return;
-	
-	UE_LOG(LogTemp, Warning, TEXT("Replicated Actor Transform"))
-	SetActorTransform(ServerState.Transform);
-	MovementComponent->SetVelocity(ServerState.Velocity);
-
-	ClearAcknowledgedMoves(ServerState.LastMove);
-
-	for (const FGoKartMove& Move : UnacknowledgedMoves)
-	{
-		MovementComponent->SimulateMove(Move);
-	}
-}
-
 void AGoKart::MoveForward(float Value)
 {
 	if (MovementComponent == nullptr) return;
@@ -116,16 +58,3 @@ void AGoKart::MoveRight(float Value)
 	MovementComponent->SetSteeringThrow(Value);
 }
 
-void AGoKart::Server_SendMove_Implementation(FGoKartMove Move)
-{
-	if (MovementComponent == nullptr) return;
-	MovementComponent->SimulateMove(Move);
-	ServerState.LastMove = Move;
-	ServerState.Transform = GetActorTransform();
-	ServerState.Velocity = MovementComponent->GetVelocity();
-}
-
-bool AGoKart::Server_SendMove_Validate(FGoKartMove Move)
-{
-	return true; // TODO: make better validation
-}

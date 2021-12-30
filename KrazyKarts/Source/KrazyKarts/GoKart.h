@@ -5,23 +5,8 @@
 #include "CoreMinimal.h"
 #include "GameFramework/Pawn.h"
 #include "GoKartMovementComponent.h"
+#include "GoKartMovementReplicator.h"
 #include "GoKart.generated.h"
-
-
-USTRUCT()
-struct FGoKartState
-{
-	GENERATED_USTRUCT_BODY()
-	
-	UPROPERTY()
-	FVector Velocity;
-
-	UPROPERTY()
-	FTransform Transform;
-	
-	UPROPERTY()
-	FGoKartMove LastMove;
-};
 
 UCLASS()
 class KRAZYKARTS_API AGoKart : public APawn
@@ -31,33 +16,22 @@ class KRAZYKARTS_API AGoKart : public APawn
 public:
 	// Sets default values for this pawn's properties
 	AGoKart();
-
-protected:
-	// Called when the game starts or when spawned
-	virtual void BeginPlay() override;
-
-public:	
 	// Called every frame
 	virtual void Tick(float DeltaTime) override;
 
 	// Called to bind functionality to input
 	virtual void SetupPlayerInputComponent(class UInputComponent* PlayerInputComponent) override;
 
+protected:
+	// Called when the game starts or when spawned
+	virtual void BeginPlay() override;
+
 private:
-	UPROPERTY(ReplicatedUsing=OnRep_ServerState)
-	FGoKartState ServerState;
-	
-	UFUNCTION()
-	void OnRep_ServerState();
-	
-	UFUNCTION(Server, Reliable, WithValidation)
-	void Server_SendMove(FGoKartMove Value);
 	void MoveForward(float Value);
 	void MoveRight(float Value);
-	void ClearAcknowledgedMoves(FGoKartMove LastMove);
 	
-	TArray<FGoKartMove> UnacknowledgedMoves;
-	
-	UPROPERTY(EditAnywhere)
+	UPROPERTY(VisibleAnywhere)
 	UGoKartMovementComponent* MovementComponent;
+	UPROPERTY(VisibleAnywhere)
+	UGoKartMovementReplicator* MovementReplicator;
 };
