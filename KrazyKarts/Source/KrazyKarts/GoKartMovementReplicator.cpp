@@ -46,7 +46,8 @@ void UGoKartMovementReplicator::TickComponent(float DeltaTime, ELevelTick TickTy
 
 	if (GetOwnerRole() == ROLE_SimulatedProxy)
 	{
-		MovementComponent->SimulateMove(GetServerState().LastMove);
+		ClientTick(DeltaTime);
+		// MovementComponent->SimulateMove(GetServerState().LastMove);
 	}
 }
 
@@ -65,6 +66,20 @@ void UGoKartMovementReplicator::UpdateServerState(const FGoKartMove& Move)
 	ServerState.LastMove = Move;
 	ServerState.Transform = GetOwner()->GetActorTransform();
 	ServerState.Velocity = MovementComponent->GetVelocity();
+}
+
+void UGoKartMovementReplicator::ClientTick(float DeltaTime)
+{
+	ClientTimeSinceUpdate += DeltaTime;
+	if (ClientTimeBtwnLastUpdates < KINDA_SMALL_NUMBER) return;
+	const float LerpRatio = ClientTimeSinceUpdate / ClientTimeBtwnLastUpdates;
+	
+	const FVector TargetLocation = GetServerState().Transform.GetLocation();
+	const FQuat TargetRotation = GetServerState().Transform.GetRotation();
+	const FVector StartLocation = ClientStartTransform.GetLocation();
+	const FQuat StartRotation = ClientStartTransform.GetRotation();
+	GetOwner()->SetActorLocation(FMath::LerpStable(StartLocation, TargetLocation, LerpRatio));
+	GetOwner()->SetActorRotation(FQuat::Slerp(StartRotation, TargetRotation, LerpRatio));
 }
 
 TArray<FGoKartMove> UGoKartMovementReplicator::GetUnacknowledgedMoves() const
@@ -97,6 +112,29 @@ void UGoKartMovementReplicator::ClearAcknowledgedMoves( FGoKartMove LastMove)
 }
 
 void UGoKartMovementReplicator::OnRep_ServerState()
+{
+	switch (GetOwnerRole())
+	{
+		case ROLE_AutonomousProxy:
+			AutonomousProxy_OnRep_ServerState();
+			break;
+		case ROLE_SimulatedProxy:
+			SimulatedProxy_OnRep_ServerState();
+			break;
+		default:
+			break;
+	}
+}
+
+void UGoKartMovementReplicator::SimulatedProxy_OnRep_ServerState()
+{
+	ClientTimeBtwnLastUpdates = ClientTimeSinceUpdate;
+	ClientTimeSinceUpdate = 0;
+
+	ClientStartTransform = GetOwner()->GetActorTransform();
+}
+
+void UGoKartMovementReplicator::AutonomousProxy_OnRep_ServerState()
 {
 	if (MovementComponent == nullptr) return;
 	

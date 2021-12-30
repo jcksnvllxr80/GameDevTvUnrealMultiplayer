@@ -47,12 +47,18 @@ private:
 	UPROPERTY(ReplicatedUsing=OnRep_ServerState)
 	FGoKartState ServerState;
 	TArray<FGoKartMove> UnacknowledgedMoves;
+	float ClientTimeSinceUpdate;
+	float ClientTimeBtwnLastUpdates;
+	FTransform ClientStartTransform;
 	UPROPERTY()
 	UGoKartMovementComponent* MovementComponent;
 
 	UFUNCTION()
 	void OnRep_ServerState();
+	void SimulatedProxy_OnRep_ServerState();
+	void AutonomousProxy_OnRep_ServerState();
 	void ClearAcknowledgedMoves(FGoKartMove LastMove);
 	void SetServerState(const FGoKartState& ServerState);
 	void UpdateServerState(const FGoKartMove& Move);
+	void ClientTick(float DeltaTime);
 };
