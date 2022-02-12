@@ -81,4 +81,9 @@ private:
 	void InterpolateVelocity(float LerpRatio, FHermiteCubicSpline Spline, float VelocityToDerivative) const;
 	void InterpolateRotation(float LerpRatio) const;
 	void ClientTick(float DeltaTime);
+	
+	UPROPERTY()
+    USceneComponent* MeshOffsetRoot;
+	UFUNCTION(BlueprintCallable)
+	void SetMeshOffsetRoot(USceneComponent* Root) { MeshOffsetRoot = Root; }
 };
