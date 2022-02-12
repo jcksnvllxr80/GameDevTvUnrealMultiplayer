@@ -203,5 +203,6 @@ void UGoKartMovementReplicator::Server_SendMove_Implementation(const FGoKartMove
 
 bool UGoKartMovementReplicator::Server_SendMove_Validate(FGoKartMove Move)
 {
-	return true; // TODO: make better validation
+	// cheat protection
+	return Move.IsValid();
 }
