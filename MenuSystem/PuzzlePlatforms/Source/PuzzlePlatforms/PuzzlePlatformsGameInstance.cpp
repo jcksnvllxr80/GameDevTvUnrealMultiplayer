@@ -205,7 +205,7 @@ void UPuzzlePlatformsGameInstance::OnDestroySessionComplete(FName SessionName, b
 {
 	if (Success)
 	{
-		UE_LOG(LogTemp, Display, TEXT("Session, %s, Destroyed successfully."));
+		UE_LOG(LogTemp, Display, TEXT("Session, %s, Destroyed successfully."), *SessionName.ToString());
 		CreateSession();
 	}
 }
